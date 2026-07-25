@@ -1,0 +1,1172 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bloom</title>
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E🌻%3C/text%3E%3C/svg%3E">
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='88'%3E🌻%3C/text%3E%3C/svg%3E">
+<style>
+:root{
+  --ink:#2e3a30; --muted:#6f7d6c; --line:#e7eee2; --bg:#fbfbf4; --card:#ffffff;
+  --green:#2f9e6b; --greendk:#2b6f4e; --red:#e5484d; --amber:#e0a52e; --blue:#4a90d9; --teal:#159b8e;
+  --shadow:0 2px 6px rgba(70,110,80,.08),0 10px 26px rgba(70,110,80,.09);
+  --sun:#f2c14e; --coral:#ef8a6a; --lav:#a99be0; --sky:#6fb7e6; --spring:#5bc48a; --wheat:#e9c46a;
+}
+*{box-sizing:border-box}
+html,body{margin:0;height:100%}
+body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;color:var(--ink);background:var(--bg);line-height:1.5}
+button{font-family:inherit;cursor:pointer}
+input,textarea,select{font-family:inherit;font-size:14px}
+.app{display:grid;grid-template-columns:230px 1fr;min-height:100vh}
+/* sidebar */
+aside{background:#12261e;color:#e9f1ec;padding:20px 14px;position:sticky;top:0;height:100vh;overflow:auto}
+aside h1{font-size:16px;margin:0 0 2px;display:flex;align-items:center;gap:8px}
+aside .tag{font-size:11px;opacity:.6;margin-bottom:18px}
+nav button{display:flex;align-items:center;gap:10px;width:100%;text-align:left;background:transparent;border:none;color:#cfe0d8;padding:10px 12px;border-radius:9px;font-size:14px;font-weight:600;margin-bottom:2px}
+nav button:hover{background:rgba(255,255,255,.07);color:#fff}
+nav button.active{background:var(--green);color:#fff}
+nav .ico{width:20px;text-align:center}
+.folderbox{margin-top:20px;padding:12px;background:rgba(255,255,255,.06);border-radius:10px;font-size:12px;color:#bcd}
+.folderbox b{color:#fff}
+.side-foot{margin-top:18px;font-size:11px;opacity:.55;line-height:1.5}
+/* main */
+main{padding:28px 34px;max-width:1180px;margin-inline:auto;box-sizing:border-box}
+.view{display:none}.view.active{display:block}
+h2.title{font-size:22px;margin:0 0 4px}
+.sub{color:var(--muted);font-size:13.5px;margin:0 0 22px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:18px 20px;margin-bottom:16px;box-shadow:var(--shadow)}
+.card h3{margin:0 0 10px;font-size:15px;color:var(--greendk)}
+.row{display:flex;gap:14px;flex-wrap:wrap}
+.btn{background:var(--green);color:#fff;border:none;border-radius:10px;padding:11px 18px;font-size:14px;font-weight:700}
+.btn:hover{background:var(--greendk)}
+.btn.ghost{background:#eef3f0;color:var(--greendk)}
+.btn.ghost:hover{background:#e0ebe5}
+.btn.sm{padding:7px 12px;font-size:12.5px;border-radius:8px}
+.pill{display:inline-block;border-radius:20px;padding:3px 10px;font-size:11.5px;font-weight:700;color:#fff}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:14px}
+.stat{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:16px;box-shadow:var(--shadow)}
+.stat .n{font-size:26px;font-weight:800;color:var(--greendk)}
+.stat .l{font-size:12.5px;color:var(--muted)}
+table{width:100%;border-collapse:collapse}
+th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted);padding:8px 8px;border-bottom:2px solid var(--line)}
+td{padding:9px 8px;border-bottom:1px solid var(--line);font-size:13.5px;vertical-align:top}
+input.f,textarea.f,select.f{width:100%;border:1px solid #d6ded9;border-radius:8px;padding:8px 10px;background:#fff}
+textarea.f{min-height:64px;resize:vertical}
+label.lab{font-size:12px;color:var(--muted);font-weight:600;display:block;margin:10px 0 4px}
+.q{border:1px solid var(--line);border-radius:12px;padding:12px 14px;margin-bottom:10px;background:#fff}
+.q .qt{font-weight:700;font-size:14px}
+.q .qw{font-size:12.5px;color:var(--muted);margin-top:3px}
+.q.checked{opacity:.55;background:#f3f7f4}
+.q .qt.done{text-decoration:line-through}
+.chk{transform:scale(1.25);margin-right:9px;accent-color:var(--green)}
+.muted{color:var(--muted)}
+.empty{color:var(--muted);font-size:13.5px;padding:8px 0}
+.banner{background:#eef7f2;border-left:4px solid var(--green);border-radius:8px;padding:12px 15px;font-size:13px;color:#1c3a2c;margin-bottom:16px}
+.warn{background:#fff5ef;border-left:4px solid var(--amber);color:#5a3a10}
+.del{color:var(--red);background:none;border:none;font-size:12px;font-weight:700}
+.tabsline{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:14px}
+.filt{border:1px solid #d6ded9;background:#fff;border-radius:20px;padding:5px 12px;font-size:12.5px;font-weight:600;color:var(--muted)}
+.filt.on{background:var(--greendk);color:#fff;border-color:var(--greendk)}
+code{background:#eef3f0;padding:2px 5px;border-radius:5px;font-size:12.5px}
+pre{background:#12261e;color:#e9f1ec;padding:16px;border-radius:12px;overflow:auto;font-size:12.5px;line-height:1.5;white-space:pre-wrap;max-height:420px}
+.st-notstarted{background:#8a94a6}.st-drafted{background:var(--blue)}.st-sent{background:var(--amber)}
+.st-replied{background:var(--green)}.st-meeting{background:var(--teal)}.st-noreply{background:#d9601a}.st-declined{background:var(--red)}.st-pending{background:#b0b0b0}
+select.status{border:none;border-radius:14px;padding:6px 10px;font-size:12px;font-weight:700;color:#fff;-webkit-appearance:none;appearance:none}
+.mini{font-size:11.5px;color:var(--muted)}
+.kanban{display:flex;gap:12px;overflow-x:auto;padding-bottom:12px}
+.kcol{min-width:210px;flex:0 0 210px;background:#eef1ef;border-radius:12px;padding:8px}
+.khead{font-size:11px;font-weight:800;color:#fff;padding:6px 10px;border-radius:8px;display:flex;justify-content:space-between;margin-bottom:8px}
+.kbody{min-height:50px;border-radius:8px}
+.kcard{background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 11px;margin-bottom:8px;cursor:grab;box-shadow:0 1px 2px rgba(0,0,0,.05)}
+.kcard:active{cursor:grabbing}
+.kwho{font-weight:700;font-size:13px}.kask{font-size:11.5px;color:var(--muted);margin:2px 0}
+.kfoot{display:flex;justify-content:space-between;align-items:center}
+.klast{font-size:11px;color:var(--greendk);margin-top:4px;background:#eef7f2;border-radius:6px;padding:3px 6px}
+.kempty{font-size:12px;color:#aab;text-align:center;padding:8px}
+@media(max-width:760px){.app{grid-template-columns:1fr}aside{position:static;height:auto}}
+ /* 🌿🌼 wildflower meadow theme */
+body{background:
+  radial-gradient(1000px 460px at 6% -6%, #f3f0d6 0%, transparent 58%),
+  radial-gradient(950px 480px at 100% -2%, #e6f2e0 0%, transparent 55%),
+  radial-gradient(880px 600px at 50% 112%, #e5edf8 0%, transparent 55%),
+  radial-gradient(680px 400px at 88% 100%, #efe7f4 0%, transparent 55%),
+  linear-gradient(135deg,#fbfbf1 0%,#f4f8ed 45%,#eef6ef 72%,#eef3fb 100%) !important;
+  background-attachment:fixed !important;}
+aside{background:linear-gradient(168deg,#2b6f52 0%,#4f9e77 52%,#8ec48c 100%) !important;color:#fff;box-shadow:4px 0 26px rgba(60,110,80,.20)}
+aside h1{color:#fff;text-shadow:0 1px 6px rgba(0,0,0,.18)}
+aside .tag{color:#eaf6ec;opacity:.9}
+nav button{color:#eaf6ec}
+nav button:hover{background:rgba(255,255,255,.18);color:#fff}
+nav button.active{background:#f2c14e;color:#5a3d00;box-shadow:0 5px 16px rgba(0,0,0,.16);font-weight:800}
+.folderbox{background:rgba(255,255,255,.15)}.folderbox b{color:#fff}
+.side-foot{opacity:.85;color:#fff}
+aside::after{content:"🌼 🌿 🌷 🌾 🌻 💐";display:block;margin-top:24px;text-align:center;font-size:16px;letter-spacing:2px;opacity:.95}
+h2.title{background:linear-gradient(90deg,#2f8f5f,#e0a94e);-webkit-background-clip:text;background-clip:text;color:transparent;font-weight:800}
+.card{border:1px solid #eaf0e3;border-radius:18px;box-shadow:0 2px 6px rgba(70,110,80,.07),0 12px 28px rgba(70,110,80,.08);transition:transform .16s ease,box-shadow .16s ease}
+.card:hover{transform:translateY(-2px);box-shadow:0 8px 16px rgba(70,110,80,.13),0 20px 40px rgba(70,110,80,.12)}
+.card h3{color:#2b6f4e}
+.btn{background:linear-gradient(135deg,#37a56f 0%,#7cc47f 100%);box-shadow:0 4px 14px rgba(60,150,100,.30);transition:filter .15s,transform .1s}
+.btn:hover{background:linear-gradient(135deg,#2f9463 0%,#6cb972 100%);filter:brightness(1.04);transform:translateY(-1px)}
+.btn.ghost{background:#eef7ee;color:#2b6f4e}.btn.ghost:hover{background:#e4f1e3}
+.banner{background:linear-gradient(135deg,#f2f8ec 0%,#fbf6e8 100%);border-left:4px solid #7cc47f;color:#2f4636;border-radius:12px}
+.warn{background:linear-gradient(135deg,#fbf5e6,#f5f8ee);border-left:4px solid #e0a52e;color:#5f4718}
+.stat{border-radius:18px;box-shadow:0 8px 22px rgba(70,110,80,.10)}
+.stat .n{background:linear-gradient(90deg,#2f8f5f,#e0a94e);-webkit-background-clip:text;background-clip:text;color:transparent}
+.q{border-radius:14px;border-color:#e7eee2}
+.chk{accent-color:#2f9e6b}
+.filt.on{background:linear-gradient(135deg,#37a56f,#7cc47f);border-color:transparent;color:#fff}
+.kcol{background:linear-gradient(180deg,#f0f7ee,#eef4f8);border:1px solid #e7eee2}
+.kcard{border-radius:14px;border-color:#e7eee2}.kcard:hover{box-shadow:0 6px 16px rgba(70,110,80,.15)}
+.klast{background:#eef7ee;color:#2b6f4e}
+a{color:#2f8f5f}
+::selection{background:#dff0d8}
+
+/* 🌱 beacon-of-growth garden */
+.app{position:relative;z-index:1}
+main{padding-bottom:190px !important}
+.garden{position:absolute;left:0;right:0;bottom:0;height:clamp(118px,15vh,172px);z-index:-1;pointer-events:none;background:linear-gradient(180deg,transparent 0%,transparent 50%,#8ccf7f 74%,#6cbb69 100%)}
+.garden svg{width:100%;height:100%;display:block;filter:drop-shadow(0 -2px 6px rgba(60,120,70,.10))}
+.sunbeam{position:fixed;top:-150px;right:-120px;width:460px;height:460px;border-radius:50%;background:radial-gradient(circle,#fff6c8 0%,#ffe89b66 34%,transparent 70%);z-index:0;pointer-events:none}
+.card{background:#ffffff}
+@media(max-width:760px){main{padding-bottom:180px !important}}
+@media print{
+ #nav,.side-foot,.garden,.tabsline,.noprint,.del,#trAdd{display:none!important}
+ .app{display:block!important}
+ main{max-width:100%!important;padding:0!important;margin:0!important}
+ .card{break-inside:avoid;box-shadow:none!important;border:1px solid #bbb;margin:6px 0;padding:8px}
+ select{-webkit-appearance:none;appearance:none;border:none!important;background:transparent!important;color:#000!important;padding:0!important;font-size:10px}
+ table{font-size:9px} th{background:#eee!important;-webkit-print-color-adjust:exact}
+ body,.app{background:#fff!important} .title{font-size:16px}
+ h2:after{content:" — printed from Bloom, verify against source reports";font-weight:normal;font-size:9px;color:#777}
+}
+</style>
+</head>
+<body>
+<div class="app">
+  <aside>
+    <h1>🌻 Bloom</h1>
+    <div class="tag" id="childTag">for your child</div>
+    <nav id="nav"></nav>
+    <div class="folderbox" id="folderbox">No folder connected.</div>
+    <div class="side-foot">🔒 100% private. Everything stays on this computer. Nothing is uploaded.</div>
+  </aside>
+  <main id="main"></main>
+  <div class="garden" aria-hidden="true"><svg viewBox="0 0 1440 185" preserveAspectRatio="xMidYMax meet" xmlns="http://www.w3.org/2000/svg"><path d="M0 168 Q360 150 720 164 T1440 160 V185 H0 Z" fill="#8ccf7f"/><path d="M0 176 Q300 162 720 176 T1440 172 V185 H0 Z" fill="#5cae63"/><path d="M0 166 Q0 153 0 140" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M13 166 Q15 149 18 133" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M26 166 Q29 148 32 129" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M39 166 Q40 149 42 132" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M52 166 Q51 153 49 140" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M65 166 Q62 154 59 141" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M78 166 Q76 150 73 135" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M91 166 Q91 149 91 132" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M104 166 Q106 150 109 134" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M117 166 Q120 153 123 141" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M130 166 Q131 149 132 132" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M143 166 Q142 147 140 128" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M156 166 Q153 148 150 130" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M169 166 Q167 152 164 137" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M182 166 Q182 152 182 138" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M195 166 Q197 150 200 133" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M208 166 Q211 150 214 134" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M221 166 Q222 152 223 137" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M234 166 Q233 154 231 143" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M247 166 Q244 150 241 134" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M260 166 Q258 147 255 129" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M273 166 Q273 148 273 130" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M286 166 Q288 151 291 136" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M299 166 Q302 151 305 136" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M312 166 Q313 148 314 131" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M325 166 Q324 148 322 131" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M338 166 Q335 151 332 137" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M351 166 Q349 156 347 145" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M364 166 Q364 151 364 136" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M377 166 Q379 148 382 131" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M390 166 Q393 149 396 131" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M403 166 Q404 152 405 137" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M416 166 Q414 151 413 135" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M429 166 Q426 148 423 129" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M442 166 Q440 147 438 129" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M455 166 Q455 150 456 134" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M468 166 Q470 154 473 142" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M481 166 Q484 151 487 136" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M494 166 Q495 150 496 134" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M507 166 Q505 150 504 134" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M520 166 Q517 153 514 139" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M533 166 Q531 151 529 136" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M546 166 Q546 148 547 130" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M559 166 Q562 147 564 128" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M572 166 Q575 150 578 133" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M585 166 Q586 153 587 140" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M598 166 Q596 150 595 133" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M611 166 Q608 149 605 131" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M624 166 Q622 150 620 135" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M637 166 Q637 154 638 143" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M650 166 Q653 152 655 139" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M663 166 Q666 149 669 131" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M676 166 Q677 148 678 130" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M689 166 Q687 150 686 134" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M702 166 Q699 152 696 139" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M715 166 Q713 149 711 132" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M728 166 Q728 147 729 129" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M741 166 Q744 149 746 132" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M754 166 Q757 153 760 140" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M767 166 Q768 153 769 140" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M780 166 Q778 150 777 134" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M793 166 Q790 149 787 132" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M806 166 Q804 151 802 136" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M819 166 Q819 153 820 140" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M832 166 Q835 149 837 131" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M845 166 Q848 147 851 128" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M858 166 Q859 148 860 131" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M871 166 Q869 152 868 138" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M884 166 Q881 151 878 137" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M897 166 Q895 149 893 133" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M910 166 Q911 150 911 134" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M923 166 Q926 152 928 139" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M936 166 Q939 154 942 142" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M949 166 Q950 150 951 133" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M962 166 Q960 147 958 129" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M975 166 Q972 148 969 131" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M988 166 Q986 152 984 138" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1001 166 Q1002 150 1002 135" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1014 166 Q1017 148 1019 130" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1027 166 Q1030 148 1032 131" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1040 166 Q1041 152 1042 138" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1053 166 Q1051 155 1049 144" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1066 166 Q1063 151 1060 136" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1079 166 Q1077 149 1075 131" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1092 166 Q1093 149 1093 132" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1105 166 Q1108 152 1110 138" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1118 166 Q1121 150 1123 134" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1131 166 Q1132 147 1132 129" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1144 166 Q1142 148 1140 129" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1157 166 Q1154 151 1151 135" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1170 166 Q1168 153 1166 141" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1183 166 Q1184 150 1184 135" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1196 166 Q1199 150 1201 134" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1209 166 Q1212 151 1214 135" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1222 166 Q1223 153 1223 141" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1235 166 Q1233 151 1231 135" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1248 166 Q1245 148 1242 129" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1261 166 Q1259 147 1257 129" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1274 166 Q1275 150 1275 134" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1287 166 Q1290 152 1292 138" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1300 166 Q1303 149 1305 132" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1313 166 Q1314 148 1314 131" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1326 166 Q1324 151 1322 135" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1339 166 Q1336 155 1333 144" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1352 166 Q1350 152 1348 138" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1365 166 Q1366 149 1366 131" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1378 166 Q1381 148 1383 130" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1391 166 Q1394 150 1396 135" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1404 166 Q1405 152 1405 138" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1417 166 Q1415 148 1413 131" stroke="#57b95f" stroke-width="3" fill="none" stroke-linecap="round"/><path d="M1430 166 Q1427 147 1424 129" stroke="#3f9a4f" stroke-width="3" fill="none" stroke-linecap="round"/><defs><radialGradient id="sfc" cx="50%" cy="50%" r="50%"><stop offset="0%" stop-color="#a9702f"/><stop offset="100%" stop-color="#6d451f"/></radialGradient></defs><g transform="translate(70,152)"><path d="M0 8 Q3 -39 0 -78" stroke="#3f9a4f" stroke-width="3.5" fill="none"/><path d="M0 -39 q-13 -5 -18 -16 q13 1 18 9z" fill="#4faa5a"/><path d="M0 -26 q13 -5 18 -16 q-13 1 -18 9z" fill="#4faa5a" opacity=".9"/><g transform="translate(0,-78)"><circle cx="0.0" cy="-12.6" r="9" fill="#ff8fab"/><circle cx="12.0" cy="-3.9" r="9" fill="#ff8fab"/><circle cx="7.4" cy="10.2" r="9" fill="#ff8fab"/><circle cx="-7.4" cy="10.2" r="9" fill="#ff8fab"/><circle cx="-12.0" cy="-3.9" r="9" fill="#ff8fab"/><circle r="6.3" fill="#ffd24a"/></g></g><g transform="translate(140,152)"><path d="M0 6 Q2 -33 0 -66" stroke="#3f9a4f" stroke-width="4" fill="none"/><path d="M0 -33 q-15 -4 -20 -18 q15 2 20 11z" fill="#4faa5a"/><g transform="translate(0,-66)"><path d="M-11 0 Q-12 -20 0 -24 Q12 -20 11 0 Q6 -6 0 -3 Q-6 -6 -11 0Z" fill="#ff5a7a"/><path d="M-11 0 Q-9 -14 0 -3 Q9 -14 11 0" fill="none" stroke="#00000018" stroke-width="1.5"/></g></g><g transform="translate(210,152)"><path d="M0 8 Q3 -45 0 -90" stroke="#3f9a4f" stroke-width="3.5" fill="none"/><path d="M0 -45 q-13 -5 -18 -16 q13 1 18 9z" fill="#4faa5a"/><path d="M0 -30 q13 -5 18 -16 q-13 1 -18 9z" fill="#4faa5a" opacity=".9"/><g transform="translate(0,-90)"><circle cx="0.0" cy="-14.0" r="10" fill="#ffd23f"/><circle cx="13.3" cy="-4.3" r="10" fill="#ffd23f"/><circle cx="8.2" cy="11.3" r="10" fill="#ffd23f"/><circle cx="-8.2" cy="11.3" r="10" fill="#ffd23f"/><circle cx="-13.3" cy="-4.3" r="10" fill="#ffd23f"/><circle r="7.0" fill="#8a5a2b"/></g></g><g transform="translate(275,152)"><path d="M0 6 Q1 -36 0 -72" stroke="#4faa5a" stroke-width="3" fill="none"/><circle cx="3" cy="-70" r="5" fill="#a679e0"/><circle cx="-3" cy="-63" r="5" fill="#a679e0"/><circle cx="3" cy="-56" r="5" fill="#a679e0"/><circle cx="-3" cy="-49" r="5" fill="#a679e0"/><circle cx="3" cy="-42" r="5" fill="#a679e0"/><circle cx="-3" cy="-35" r="5" fill="#a679e0"/></g><g transform="translate(340,152)"><path d="M0 8 Q3 -35 0 -70" stroke="#3f9a4f" stroke-width="3.5" fill="none"/><path d="M0 -35 q-13 -5 -18 -16 q13 1 18 9z" fill="#4faa5a"/><path d="M0 -24 q13 -5 18 -16 q-13 1 -18 9z" fill="#4faa5a" opacity=".9"/><g transform="translate(0,-70)"><circle cx="0.0" cy="-12.6" r="9" fill="#7ec8ff"/><circle cx="12.0" cy="-3.9" r="9" fill="#7ec8ff"/><circle cx="7.4" cy="10.2" r="9" fill="#7ec8ff"/><circle cx="-7.4" cy="10.2" r="9" fill="#7ec8ff"/><circle cx="-12.0" cy="-3.9" r="9" fill="#7ec8ff"/><circle r="6.3" fill="#ffd24a"/></g></g><g transform="translate(420,152)"><path d="M0 8 Q3 -48 0 -96" stroke="#3f8f47" stroke-width="5" fill="none"/><path d="M0 -48 q-18 -6 -24 -22 q18 3 24 13z" fill="#4faa5a"/><g transform="translate(0,-96)"><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(0)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(30)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(60)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(90)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(120)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(150)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(180)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(210)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(240)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(270)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(300)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(330)"/><circle r="14" fill="#8a5a2b"/><circle r="14" fill="url(#sfc)"/></g></g><g transform="translate(500,152)"><path d="M0 8 Q3 -37 0 -74" stroke="#3f9a4f" stroke-width="3.5" fill="none"/><path d="M0 -37 q-13 -5 -18 -16 q13 1 18 9z" fill="#4faa5a"/><path d="M0 -25 q13 -5 18 -16 q-13 1 -18 9z" fill="#4faa5a" opacity=".9"/><g transform="translate(0,-74)"><circle cx="0.0" cy="-12.6" r="9" fill="#ffffff"/><circle cx="12.0" cy="-3.9" r="9" fill="#ffffff"/><circle cx="7.4" cy="10.2" r="9" fill="#ffffff"/><circle cx="-7.4" cy="10.2" r="9" fill="#ffffff"/><circle cx="-12.0" cy="-3.9" r="9" fill="#ffffff"/><circle r="6.3" fill="#ffcf3f"/></g></g><g transform="translate(565,152)"><path d="M0 6 Q2 -30 0 -60" stroke="#3f9a4f" stroke-width="4" fill="none"/><path d="M0 -30 q-15 -4 -20 -18 q15 2 20 11z" fill="#4faa5a"/><g transform="translate(0,-60)"><path d="M-11 0 Q-12 -20 0 -24 Q12 -20 11 0 Q6 -6 0 -3 Q-6 -6 -11 0Z" fill="#ff7a3c"/><path d="M-11 0 Q-9 -14 0 -3 Q9 -14 11 0" fill="none" stroke="#00000018" stroke-width="1.5"/></g></g><g transform="translate(635,152)"><path d="M0 8 Q3 -43 0 -86" stroke="#3f9a4f" stroke-width="3.5" fill="none"/><path d="M0 -43 q-13 -5 -18 -16 q13 1 18 9z" fill="#4faa5a"/><path d="M0 -29 q13 -5 18 -16 q-13 1 -18 9z" fill="#4faa5a" opacity=".9"/><g transform="translate(0,-86)"><circle cx="0.0" cy="-12.6" r="9" fill="#c79bff"/><circle cx="12.0" cy="-3.9" r="9" fill="#c79bff"/><circle cx="7.4" cy="10.2" r="9" fill="#c79bff"/><circle cx="-7.4" cy="10.2" r="9" fill="#c79bff"/><circle cx="-12.0" cy="-3.9" r="9" fill="#c79bff"/><circle r="6.3" fill="#ffd24a"/></g></g><g transform="translate(705,152)"><path d="M0 8 Q3 -33 0 -66" stroke="#3f9a4f" stroke-width="3.5" fill="none"/><path d="M0 -33 q-13 -5 -18 -16 q13 1 18 9z" fill="#4faa5a"/><path d="M0 -22 q13 -5 18 -16 q-13 1 -18 9z" fill="#4faa5a" opacity=".9"/><g transform="translate(0,-66)"><circle cx="0.0" cy="-12.6" r="9" fill="#ff6f61"/><circle cx="12.0" cy="-3.9" r="9" fill="#ff6f61"/><circle cx="7.4" cy="10.2" r="9" fill="#ff6f61"/><circle cx="-7.4" cy="10.2" r="9" fill="#ff6f61"/><circle cx="-12.0" cy="-3.9" r="9" fill="#ff6f61"/><circle r="6.3" fill="#ffe08a"/></g></g><g transform="translate(770,152)"><path d="M0 6 Q1 -40 0 -80" stroke="#4faa5a" stroke-width="3" fill="none"/><circle cx="3" cy="-78" r="5" fill="#a679e0"/><circle cx="-3" cy="-71" r="5" fill="#a679e0"/><circle cx="3" cy="-64" r="5" fill="#a679e0"/><circle cx="-3" cy="-57" r="5" fill="#a679e0"/><circle cx="3" cy="-50" r="5" fill="#a679e0"/><circle cx="-3" cy="-43" r="5" fill="#a679e0"/></g><g transform="translate(835,152)"><path d="M0 8 Q3 -41 0 -82" stroke="#3f9a4f" stroke-width="3.5" fill="none"/><path d="M0 -41 q-13 -5 -18 -16 q13 1 18 9z" fill="#4faa5a"/><path d="M0 -28 q13 -5 18 -16 q-13 1 -18 9z" fill="#4faa5a" opacity=".9"/><g transform="translate(0,-82)"><circle cx="0.0" cy="-14.0" r="10" fill="#ffd23f"/><circle cx="13.3" cy="-4.3" r="10" fill="#ffd23f"/><circle cx="8.2" cy="11.3" r="10" fill="#ffd23f"/><circle cx="-8.2" cy="11.3" r="10" fill="#ffd23f"/><circle cx="-13.3" cy="-4.3" r="10" fill="#ffd23f"/><circle r="7.0" fill="#8a5a2b"/></g></g><g transform="translate(905,152)"><path d="M0 6 Q2 -32 0 -64" stroke="#3f9a4f" stroke-width="4" fill="none"/><path d="M0 -32 q-15 -4 -20 -18 q15 2 20 11z" fill="#4faa5a"/><g transform="translate(0,-64)"><path d="M-11 0 Q-12 -20 0 -24 Q12 -20 11 0 Q6 -6 0 -3 Q-6 -6 -11 0Z" fill="#ff5a7a"/><path d="M-11 0 Q-9 -14 0 -3 Q9 -14 11 0" fill="none" stroke="#00000018" stroke-width="1.5"/></g></g><g transform="translate(975,152)"><path d="M0 8 Q3 -36 0 -72" stroke="#3f9a4f" stroke-width="3.5" fill="none"/><path d="M0 -36 q-13 -5 -18 -16 q13 1 18 9z" fill="#4faa5a"/><path d="M0 -24 q13 -5 18 -16 q-13 1 -18 9z" fill="#4faa5a" opacity=".9"/><g transform="translate(0,-72)"><circle cx="0.0" cy="-12.6" r="9" fill="#7ec8ff"/><circle cx="12.0" cy="-3.9" r="9" fill="#7ec8ff"/><circle cx="7.4" cy="10.2" r="9" fill="#7ec8ff"/><circle cx="-7.4" cy="10.2" r="9" fill="#7ec8ff"/><circle cx="-12.0" cy="-3.9" r="9" fill="#7ec8ff"/><circle r="6.3" fill="#ffd24a"/></g></g><g transform="translate(1055,152)"><path d="M0 8 Q3 -45 0 -90" stroke="#3f8f47" stroke-width="5" fill="none"/><path d="M0 -45 q-18 -6 -24 -22 q18 3 24 13z" fill="#4faa5a"/><g transform="translate(0,-90)"><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(0)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(30)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(60)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(90)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(120)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(150)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(180)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(210)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(240)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(270)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(300)"/><ellipse cx="0" cy="-20" rx="7" ry="15" fill="#ffcf33" transform="rotate(330)"/><circle r="14" fill="#8a5a2b"/><circle r="14" fill="url(#sfc)"/></g></g><g transform="translate(1130,152)"><path d="M0 8 Q3 -38 0 -76" stroke="#3f9a4f" stroke-width="3.5" fill="none"/><path d="M0 -38 q-13 -5 -18 -16 q13 1 18 9z" fill="#4faa5a"/><path d="M0 -26 q13 -5 18 -16 q-13 1 -18 9z" fill="#4faa5a" opacity=".9"/><g transform="translate(0,-76)"><circle cx="0.0" cy="-12.6" r="9" fill="#ff8fab"/><circle cx="12.0" cy="-3.9" r="9" fill="#ff8fab"/><circle cx="7.4" cy="10.2" r="9" fill="#ff8fab"/><circle cx="-7.4" cy="10.2" r="9" fill="#ff8fab"/><circle cx="-12.0" cy="-3.9" r="9" fill="#ff8fab"/><circle r="6.3" fill="#ffd24a"/></g></g><g transform="translate(1200,152)"><path d="M0 8 Q3 -33 0 -66" stroke="#3f9a4f" stroke-width="3.5" fill="none"/><path d="M0 -33 q-13 -5 -18 -16 q13 1 18 9z" fill="#4faa5a"/><path d="M0 -22 q13 -5 18 -16 q-13 1 -18 9z" fill="#4faa5a" opacity=".9"/><g transform="translate(0,-66)"><circle cx="0.0" cy="-12.6" r="9" fill="#ffffff"/><circle cx="12.0" cy="-3.9" r="9" fill="#ffffff"/><circle cx="7.4" cy="10.2" r="9" fill="#ffffff"/><circle cx="-7.4" cy="10.2" r="9" fill="#ffffff"/><circle cx="-12.0" cy="-3.9" r="9" fill="#ffffff"/><circle r="6.3" fill="#ffcf3f"/></g></g><g transform="translate(1260,152)"><path d="M0 6 Q1 -37 0 -74" stroke="#4faa5a" stroke-width="3" fill="none"/><circle cx="3" cy="-72" r="5" fill="#a679e0"/><circle cx="-3" cy="-65" r="5" fill="#a679e0"/><circle cx="3" cy="-58" r="5" fill="#a679e0"/><circle cx="-3" cy="-51" r="5" fill="#a679e0"/><circle cx="3" cy="-44" r="5" fill="#a679e0"/><circle cx="-3" cy="-37" r="5" fill="#a679e0"/></g><g transform="translate(1325,152)"><path d="M0 8 Q3 -42 0 -84" stroke="#3f9a4f" stroke-width="3.5" fill="none"/><path d="M0 -42 q-13 -5 -18 -16 q13 1 18 9z" fill="#4faa5a"/><path d="M0 -28 q13 -5 18 -16 q-13 1 -18 9z" fill="#4faa5a" opacity=".9"/><g transform="translate(0,-84)"><circle cx="0.0" cy="-12.6" r="9" fill="#c79bff"/><circle cx="12.0" cy="-3.9" r="9" fill="#c79bff"/><circle cx="7.4" cy="10.2" r="9" fill="#c79bff"/><circle cx="-7.4" cy="10.2" r="9" fill="#c79bff"/><circle cx="-12.0" cy="-3.9" r="9" fill="#c79bff"/><circle r="6.3" fill="#ffd24a"/></g></g><g transform="translate(1395,152)"><path d="M0 6 Q2 -31 0 -62" stroke="#3f9a4f" stroke-width="4" fill="none"/><path d="M0 -31 q-15 -4 -20 -18 q15 2 20 11z" fill="#4faa5a"/><g transform="translate(0,-62)"><path d="M-11 0 Q-12 -20 0 -24 Q12 -20 11 0 Q6 -6 0 -3 Q-6 -6 -11 0Z" fill="#ff7a3c"/><path d="M-11 0 Q-9 -14 0 -3 Q9 -14 11 0" fill="none" stroke="#00000018" stroke-width="1.5"/></g></g><g transform="translate(330,54) scale(1.1)"><ellipse cx="-7" cy="-6" rx="8" ry="11" fill="#ff9e57" transform="rotate(-20 -7 -6)"/><ellipse cx="7" cy="-6" rx="8" ry="11" fill="#ff9e57" transform="rotate(20 7 -6)"/><ellipse cx="-6" cy="7" rx="6" ry="8" fill="#ffd23f" transform="rotate(20 -6 7)"/><ellipse cx="6" cy="7" rx="6" ry="8" fill="#ffd23f" transform="rotate(-20 6 7)"/><rect x="-1.3" y="-11" width="2.6" height="22" rx="1.3" fill="#5a3d2b"/><path d="M0 -11 q-4 -6 -7 -7 M0 -11 q4 -6 7 -7" stroke="#5a3d2b" stroke-width="1.3" fill="none"/></g><g transform="translate(880,44) scale(1.0)"><ellipse cx="-7" cy="-6" rx="8" ry="11" fill="#8fb3ff" transform="rotate(-20 -7 -6)"/><ellipse cx="7" cy="-6" rx="8" ry="11" fill="#8fb3ff" transform="rotate(20 7 -6)"/><ellipse cx="-6" cy="7" rx="6" ry="8" fill="#c79bff" transform="rotate(20 -6 7)"/><ellipse cx="6" cy="7" rx="6" ry="8" fill="#c79bff" transform="rotate(-20 6 7)"/><rect x="-1.3" y="-11" width="2.6" height="22" rx="1.3" fill="#5a3d2b"/><path d="M0 -11 q-4 -6 -7 -7 M0 -11 q4 -6 7 -7" stroke="#5a3d2b" stroke-width="1.3" fill="none"/></g><g transform="translate(1180,58) scale(0.9)"><ellipse cx="-7" cy="-6" rx="8" ry="11" fill="#ff8fab" transform="rotate(-20 -7 -6)"/><ellipse cx="7" cy="-6" rx="8" ry="11" fill="#ff8fab" transform="rotate(20 7 -6)"/><ellipse cx="-6" cy="7" rx="6" ry="8" fill="#ffe08a" transform="rotate(20 -6 7)"/><ellipse cx="6" cy="7" rx="6" ry="8" fill="#ffe08a" transform="rotate(-20 6 7)"/><rect x="-1.3" y="-11" width="2.6" height="22" rx="1.3" fill="#5a3d2b"/><path d="M0 -11 q-4 -6 -7 -7 M0 -11 q4 -6 7 -7" stroke="#5a3d2b" stroke-width="1.3" fill="none"/></g></svg></div>
+</div>
+<div class="sunbeam" aria-hidden="true"></div>
+
+<!-- hidden folder picker -->
+<input type="file" id="dirpick" webkitdirectory directory multiple style="display:none">
+<input type="file" id="filepick" multiple style="display:none">
+<input type="file" id="importpick" accept="application/json" style="display:none">
+
+<script>
+/* ============================================================
+   BLOOM — single-file, private, offline.
+   Created by AP / AutomateScale / PalmerLewis. MIT.
+   Not medical or legal advice.
+   ============================================================ */
+const KEY='bloom_state_v1';
+/* ===== Google Drive (optional cloud connect). Paste your own keys here — see SETUP-GOOGLE.md.
+   Leave blank to use the local folder option (which already reads a Google Drive Desktop folder). ===== */
+const GOOGLE_CLIENT_ID=''; // OAuth 2.0 Client ID (Web application)
+const GOOGLE_API_KEY='';   // API key (Drive API + Picker API enabled)
+const VIEWS=[
+  ['overview','📋','Overview'],
+  ['fights','🎯','Fights'],
+  ['timeline','🕒','Timeline'],
+  ['docs','📁','Documents'],
+  ['scans','🩻','Scans'],
+  ['questions','❓','Questions to Ask'],
+  ['outreach','✉️','Outreach'],
+  ['trials','🧬','Trials'],
+  ['team','🩺','Care Team'],
+  ['board','🗂️','Board'],
+  ['assist','💬','Talk it through'],
+  ['faith','🕊️','Faith & Strength'],
+  ['about','🔒','About & Privacy'],
+];
+
+const DEFAULT_QUESTIONS=[
+ {c:'Understand the diagnosis',t:'What exactly is the diagnosis — the precise type, subtype, and any genetic/molecular markers?',w:'The exact subtype drives everything: prognosis, treatment, and trial eligibility. Get it in writing.'},
+ {c:'Understand the diagnosis',t:'What is the stage / extent, and what does that mean for the goal — cure, control, or comfort?',w:'Knowing the honest goal lets you judge whether the plan matches it.'},
+ {c:'Understand the diagnosis',t:'Has the pathology been reviewed by a second pathologist at an expert center?',w:'Rare diseases are misclassified more often than people think. A second read is cheap insurance.'},
+ {c:'The treatment plan',t:'Are we treating with curative intent, or is this a holding / comfort approach? I want the honest answer.',w:'The whole plan should be judged against its actual goal. Vague "let\'s monitor" deserves a why.'},
+ {c:'The treatment plan',t:'Is the current treatment the strongest evidence-based option, or is there a more active one we\'re not using?',w:'Make sure no better option is being skipped by default. Ask what the alternatives are and why they were ruled out.'},
+ {c:'The treatment plan',t:'What has my child already received, and what are the cumulative doses / limits that constrain what we can still safely give?',w:'Prior treatment limits future options (e.g. heart, kidney, marrow). Know the numbers before decisions.'},
+ {c:'Second opinions & panels',t:'Can this case be reviewed by an expert tumor board / panel, not just one center?',w:'For hard cases, multi-expert consensus beats a single opinion. Ask for it explicitly.'},
+ {c:'Second opinions & panels',t:'Which top centers/experts for this specific disease would you send your own child to?',w:'Doctors know who the real experts are. This question gets you the honest shortlist.'},
+ {c:'Trials & new options',t:'Is my child eligible for any clinical trial — here or elsewhere — and what would he need to qualify?',w:'Trials are where tomorrow\'s treatments are. Ask what tests/tissue are needed to pre-qualify NOW.'},
+ {c:'Trials & new options',t:'Is there any compassionate-use / expanded-access route to a promising therapy not otherwise available?',w:'When standard options narrow, this can open a door. It\'s physician-initiated — ask them to explore it.'},
+ {c:'Tests & monitoring',t:'What is the written surveillance plan — which scans/tests, how often, for how long?',w:'Catching a problem early changes outcomes. Get the schedule on paper, not "we\'ll see."'},
+ {c:'Tests & monitoring',t:'Should we bank/archive tissue and get molecular profiling done, so options are ready if things change?',w:'Preserving tissue and profiling now means no delay later when you may need it most.'},
+ {c:'The whole child',t:'What are the long-term / late effects of this treatment, and how do we monitor them?',w:'Survivorship matters. Ask what to watch for years down the line.'},
+ {c:'The whole child',t:'What support exists for us — pain, nutrition, mental health, fertility, financial, travel?',w:'You and your child are more than the disease. These supports exist; ask to be connected.'},
+];
+
+const DEFAULT_OUTREACH=[
+ {cat:'Treating team',who:'Main doctor',contact:'',ask:'Key questions & requests',s:'notstarted'},
+ {cat:'Second opinions',who:'Expert center #1',contact:'',ask:'Review the case; is the plan right?',s:'notstarted'},
+ {cat:'Second opinions',who:'Expert center #2',contact:'',ask:'Independent opinion',s:'notstarted'},
+ {cat:'Trials & new options',who:'Trial / program',contact:'',ask:'Eligibility & referral',s:'pending'},
+ {cat:'Foundations & navigation',who:'Disease foundation',contact:'',ask:'Connect us to experts/trials; support',s:'notstarted'},
+];
+
+const STATUSES=[['notstarted','Not started'],['drafted','Drafted'],['sent','Sent'],['replied','Replied'],['meeting','Meeting set'],['noreply','No reply 7d+'],['declined','Declined'],['pending','To research']];
+
+function blank(){return {
+  profile:{child:'',dob:'',dx:'',markers:'',stage:'',current:'',updated:''},
+  priorities:['',''],
+  timeline:[],
+  docs:[],
+  questions:JSON.parse(JSON.stringify(DEFAULT_QUESTIONS)).map((q,i)=>({...q,id:'q'+i,done:false})),
+  outreach:JSON.parse(JSON.stringify(DEFAULT_OUTREACH)).map((o,i)=>({...o,id:'o'+i})),
+  folderName:'',
+  chat:[],
+  ai:{backend:'ollama',ollamaModel:'llama3.2:3b',claudeKey:'',claudeModel:'claude-3-5-sonnet-latest',openaiKey:'',openaiModel:'gpt-4o-mini'}
+};}
+let S=load();
+function load(){try{const v=JSON.parse(localStorage.getItem(KEY));return v&&v.profile?v:blank();}catch(e){return blank();}}
+function save(){localStorage.setItem(KEY,JSON.stringify(S));}
+function esc(s){return (s||'').replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+/* A real, filled-in example so a new parent can see how Bloom works. */
+function exampleState(){
+  const s=blank();
+  s.profile={child:'Alex (example)',dob:'—',dx:'a serious childhood illness',markers:'',stage:'',current:'This is a sample so you can see how Bloom works. Clear it and enter your own child.',updated:'example'};
+  s.priorities=['Get a second opinion from a top specialist for this exact diagnosis','Ask what the strongest treatment option is — and whether anything is being skipped','Confirm the next scan/test date and what it decides'];
+  s.timeline=[
+    {id:'t1',date:'2025-01',title:'Diagnosis',note:'example event'},
+    {id:'t2',date:'2025-06',title:'Surgery / procedure',note:'example event'},
+    {id:'t3',date:'2025-09',title:'Finished first course of treatment'},
+    {id:'t4',date:'2026-05',title:'A change / setback',note:'example event'},
+    {id:'t5',date:'2026-07',title:'Next scan / decision point'}
+  ];
+  s.questions.forEach((q,i)=>{if(i%3===0)q.done=true;});
+  s.outreach=[
+    {id:'o1',cat:'Treating team',who:'Primary oncologist',contact:'',ask:'Panel referral + the two key options',s:'sent'},
+    {id:'o2',cat:'Second opinions',who:'Consulting expert',contact:'',ask:'Second-remission strategy',s:'replied'},
+    {id:'o3',cat:'Second opinions',who:'Top Ewing center',contact:'',ask:'Expert team review',s:'drafted'},
+    {id:'o4',cat:'Second opinions',who:'Relapse-trial center',contact:'',ask:'Trial eligibility + strategy',s:'sent'},
+    {id:'o5',cat:'Foundations & navigation',who:'Disease-specific foundation',contact:'',ask:'Tumor board + navigation',s:'notstarted'}
+  ];
+  s.folderName='Example';
+  return s;
+}
+function loadExample(){S=exampleState();save();cur='overview';render();}
+
+let cur='overview';
+function nav(){
+  const n=document.getElementById('nav');n.innerHTML='';
+  VIEWS.forEach(([id,ic,label])=>{
+    const b=document.createElement('button');b.className='navbtn'+(id===cur?' active':'');
+    b.innerHTML=`<span class="ico">${ic}</span> ${label}`;
+    b.onclick=()=>{cur=id;render();};n.appendChild(b);
+  });
+  document.getElementById('folderbox').innerHTML = S.folderName
+    ? `📁 <b>${esc(S.folderName)}</b><br>${S.docs.length} files catalogued`
+    : 'No folder connected yet.';
+  const ct=document.getElementById('childTag');if(ct)ct.textContent='for '+(S.profile.child||'your child');
+}
+
+function render(){
+  nav();
+  const m=document.getElementById('main');
+  m.innerHTML = ({overview:vOverview,fights:vFights,timeline:vTimeline,docs:vDocs,questions:vQuestions,scans:vScans,trials:vTrials,outreach:vOutreach,team:vTeam,board:vBoard,assist:vAssist,faith:vFaith,about:vAbout})[cur]();
+  wire();
+}
+
+/* ---------------- OVERVIEW ---------------- */
+function vFights(){
+  const U={now:['#c0392b','⚡ NOW — this week'],high:['#c88a2e','↑ High'],ongoing:['#6b4fc4','↻ Ongoing']};
+  const TH={medical:['🧬','For his life — the treatment fight'],access:['🕊️','To be with him — the access fight']};
+  const fights=S.fights||[];
+  if(!fights.length)return `<h2 class="title">What We're Fighting For</h2><p class="sub">No fights logged yet.</p>`;
+  return `
+  <h2 class="title">What We're Fighting For</h2>
+  <p class="sub">The battles that actually change the outcome — each with the <b>concern</b>, the <b>push</b>, and what's at stake. This is the whole war on one page, so nothing high-leverage ever gets buried.</p>
+  ${['medical','access'].map(g=>{
+    const list=fights.filter(f=>f.theater===g);
+    if(!list.length)return '';
+    return `<h3 style="margin:20px 0 10px;color:#0a5137;font-size:16px">${TH[g][0]} ${TH[g][1]}</h3>
+    ${list.map(f=>{const u=U[f.urgency]||U.high;return `
+      <div class="card" style="border-left:4px solid ${u[0]}">
+        <div style="display:flex;justify-content:space-between;align-items:flex-start;gap:10px;flex-wrap:wrap">
+          <b style="font-size:15px">${esc(f.title)}</b>
+          <span style="background:${u[0]};color:#fff;padding:2px 9px;border-radius:11px;font-size:11px;font-weight:800;white-space:nowrap">${u[1]}</span>
+        </div>
+        <div style="margin-top:8px;font-size:13.5px;line-height:1.5"><span style="color:#c0392b;font-weight:800;font-size:11px">⚠ CONCERN&nbsp;&nbsp;</span>${esc(f.concern)}</div>
+        <div style="margin-top:6px;font-size:13.5px;line-height:1.5"><span style="color:#0a8a5f;font-weight:800;font-size:11px">➜ THE PUSH&nbsp;&nbsp;</span>${esc(f.push)}</div>
+        ${f.stakes?`<div style="margin-top:6px;font-size:12px;color:var(--muted);font-style:italic">What's at stake: ${esc(f.stakes)}</div>`:''}
+      </div>`;}).join('')}`;
+  }).join('')}`;
+}
+
+function vOverview(){
+  const p=S.profile;
+  const openQ=S.questions.filter(q=>!q.done).length;
+  const sent=S.outreach.filter(o=>['sent','replied','meeting'].includes(o.s)).length;
+  const replied=S.outreach.filter(o=>o.s==='replied'||o.s==='meeting').length;
+  const isoOf=s=>{const m=(s||'').match(/\d{4}-\d{2}(?:-\d{2})?/);return m?(m[0].length===7?m[0]+'-01':m[0]):null;};
+  const next=[...S.timeline].map(t=>({t,iso:isoOf(t.date)})).filter(x=>x.iso&&x.iso>=today()).sort((a,b)=>a.iso.localeCompare(b.iso)).map(x=>x.t)[0];
+  return `
+  <h2 class="title">Overview</h2>
+  <p class="sub">The whole picture on one screen. ${p.updated?('Updated '+esc(p.updated)):''} &nbsp;<button class="btn ghost sm" id="loadEx">👀 See a filled-in example</button></p>
+  ${!S.folderName?`<div class="banner">👋 <b>Start here:</b> go to <b>Documents</b> and connect your folder (on your computer or your Google Drive folder). Then fill in the child profile below. Everything stays private on this machine.</div>`:''}
+  <div class="grid" style="margin-bottom:18px">
+    <div class="stat"><div class="n">${S.docs.length}</div><div class="l">documents organized</div></div>
+    <div class="stat"><div class="n">${openQ}</div><div class="l">questions still to ask</div></div>
+    <div class="stat"><div class="n">${sent}</div><div class="l">people contacted</div></div>
+    <div class="stat"><div class="n">${replied}</div><div class="l">replies / meetings</div></div>
+  </div>
+  <div class="card"><h3>Child</h3>
+    <div class="row">
+      <div style="flex:1;min-width:200px"><label class="lab">Name</label><input class="f" data-p="child" value="${esc(p.child)}" placeholder="Child's name"></div>
+      <div style="flex:1;min-width:140px"><label class="lab">Date of birth</label><input class="f" data-p="dob" value="${esc(p.dob)}" placeholder="e.g. 22 Jan 2018"></div>
+    </div>
+    <label class="lab">Diagnosis</label><input class="f" data-p="dx" value="${esc(p.dx)}" placeholder="e.g. Ewing sarcoma">
+    <div class="row">
+      <div style="flex:1;min-width:200px"><label class="lab">Genetic / molecular markers</label><input class="f" data-p="markers" value="${esc(p.markers)}" placeholder="e.g. EWSR1-ETV1, MSS"></div>
+      <div style="flex:1;min-width:140px"><label class="lab">Stage / extent</label><input class="f" data-p="stage" value="${esc(p.stage)}" placeholder="e.g. Stage 4"></div>
+    </div>
+    <label class="lab">Current status / treatment (one line)</label><input class="f" data-p="current" value="${esc(p.current)}" placeholder="e.g. relapsed, on regorafenib, restaging soon">
+    <label class="lab">Last updated</label><input class="f" data-p="updated" value="${esc(p.updated)}" placeholder="today's date + a short note">
+  </div>
+  <div class="card"><h3>🎯 Top priorities right now</h3>
+    <p class="mini">The 1–3 most important things to do or decide. Keep this short.</p>
+    ${S.priorities.map((x,i)=>`<input class="f" data-pri="${i}" value="${esc(x)}" placeholder="Priority ${i+1}" style="margin-bottom:8px">`).join('')}
+    <button class="btn ghost sm" id="addPri">+ add priority</button>
+  </div>
+  ${next?`<div class="card"><h3>⏳ Next deadline</h3><b>${esc(next.date)}</b> — ${esc(next.title)} <span class="mini">(${daysTo(next.date)})</span></div>`:''}
+  `;
+}
+
+/* ---------------- TIMELINE ---------------- */
+function vTimeline(){
+  const items=[...S.timeline].sort((a,b)=>(a.date||'').localeCompare(b.date||''));
+  return `
+  <h2 class="title">Timeline</h2>
+  <p class="sub">Every event, in order — diagnoses, treatments, scans, appointments. Your case at a glance.</p>
+  <div class="card"><h3>Add an event</h3>
+    <div class="row">
+      <div style="width:150px"><label class="lab">Date</label><input class="f" id="tlDate" placeholder="2026-05-12"></div>
+      <div style="flex:1;min-width:220px"><label class="lab">What happened</label><input class="f" id="tlTitle" placeholder="e.g. Lung nodules resected"></div>
+    </div>
+    <label class="lab">Notes (optional)</label><input class="f" id="tlNote" placeholder="detail, result, who">
+    <div style="margin-top:10px"><button class="btn sm" id="tlAdd">+ Add to timeline</button></div>
+  </div>
+  <div class="card"><h3>Events</h3>
+    ${items.length?`<table><tr><th style="width:120px">Date</th><th>Event</th><th></th></tr>
+      ${items.map(t=>`<tr><td><b>${esc(t.date)}</b></td><td>${esc(t.title)}${t.note?`<div class="mini">${esc(t.note)}</div>`:''}</td><td><button class="del" data-deltl="${t.id}">remove</button></td></tr>`).join('')}
+    </table>`:`<div class="empty">No events yet. Add your child's diagnosis date to start.</div>`}
+  </div>`;
+}
+
+/* ---------------- DOCUMENTS ---------------- */
+let docFilter='all';
+let docFiles={}; // filename(lower) -> object URL, session-only (for in-app preview)
+const DOCEXT=['pdf','doc','docx','jpg','jpeg','png','gif','webp','heic','bmp','txt','md','csv','rtf','xls','xlsx','pages','ppt','pptx'];
+function baseName(p){return (p||'').split('/').pop()||'';}
+function vDocs(){
+  const cats=['all',...Array.from(new Set(S.docs.map(d=>d.cat))).filter(Boolean)];
+  const list=S.docs.filter(d=>docFilter==='all'||d.cat===docFilter);
+  return `
+  <h2 class="title">Documents</h2>
+  <p class="sub">Connect the folder where you keep your child's records — on your computer, or your Google Drive desktop folder. It reads them <b>here, privately</b> so you can view &amp; preview every file in-app. Nothing is uploaded.</p>
+  <div class="card">
+    <div class="row">
+      <button class="btn" id="pickDir">📁 Connect a folder (this computer)</button>
+      <button class="btn" id="connectGoogle" style="background:#1a73e8">▾ Connect Google Drive</button>
+      <button class="btn ghost" id="pickFiles">+ Add files</button>
+      <button class="btn ghost" id="rescan">↻ Re-scan</button>
+    </div>
+    <p class="mini" style="margin-top:10px"><b>Two easy ways:</b> (1) If you use <b>Google Drive for Desktop</b>, your Drive is just a folder on this computer — click "Connect a folder" and choose your Google Drive folder. Works instantly, no setup. (2) Or click <b>"Connect Google Drive"</b> to sign in to Google directly (needs a one-time setup — see SETUP-GOOGLE.md). Either way, files are read privately in your browser; nothing is uploaded to us.</p>
+  </div>
+  <div id="docModal" style="display:none;position:fixed;inset:0;background:rgba(20,30,24,.88);z-index:9999;padding:22px">
+    <div style="max-width:1024px;margin:0 auto;height:100%;display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;align-items:center;color:#fff;margin-bottom:8px;gap:10px">
+        <b id="docModalName" style="font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></b>
+        <button class="btn sm" id="docModalClose" style="background:#8a8f8c;flex:none">✕ Close</button>
+      </div>
+      <iframe id="docFrame" style="flex:1;width:100%;border:0;border-radius:10px;background:#fff"></iframe>
+    </div>
+  </div>
+  ${S.docs.length?`
+  <div class="tabsline">${cats.map(c=>`<button class="filt${c===docFilter?' on':''}" data-filt="${c}">${c==='all'?'All':esc(c)} ${c==='all'?`(${S.docs.length})`:`(${S.docs.filter(d=>d.cat===c).length})`}</button>`).join('')}</div>
+  <div class="card"><table><tr><th>File</th><th style="width:170px">View</th><th style="width:150px">Category</th><th style="width:70px">Type</th></tr>
+    ${list.map(d=>{
+      const key=(baseName(d.path)||d.name||'').toLowerCase();
+      const url=docFiles[key]||docFiles[(d.name||'').toLowerCase()];
+      const isImg=['jpg','jpeg','png','gif','webp','heic','bmp'].includes((d.ext||'').toLowerCase());
+      const openHref=url||(/^(file|https?|blob):/.test(d.path||'')?d.path:'');
+      const view=url?`<button class="btn sm" data-prev="${url}" data-ptype="${isImg?'img':'pdf'}" data-pname="${esc(d.name)}">👁 Preview</button> <a class="btn sm ghost" href="${url}" target="_blank" rel="noopener" title="Open in new tab">⤢</a>`:(openHref?`<a class="btn sm ghost" href="${esc(openHref)}" target="_blank" rel="noopener">⤢ Open</a>`:`<span class="mini">connect folder ↑</span>`);
+      return `<tr>
+      <td><b>${esc(d.name)}</b>${d.snippet?`<div class="mini">${esc(d.snippet.slice(0,120))}…</div>`:''}</td>
+      <td>${view}</td>
+      <td><select class="f" data-doccat="${d.id}" style="padding:5px 8px">${['Uncategorised','Pathology','Imaging/Scans','Lab results','Doctor letters','Genetics/Molecular','Treatment/Protocol','Second opinions','Legal','Other'].map(c=>`<option ${d.cat===c?'selected':''}>${c}</option>`).join('')}</select></td>
+      <td class="mini">${esc(d.ext||'')}</td></tr>`;}).join('')}
+  </table></div>`:`<div class="card"><div class="empty">No documents yet. Click "Connect a folder" above.</div></div>`}
+  `;
+}
+
+/* ---------------- SCANS (imaging sorted by modality) ---------------- */
+function isImaging(d){
+  const n=(d.name||'').toLowerCase();
+  return (d.cat||'').toLowerCase().includes('imaging') || ['dcm','dicom'].includes((d.ext||'').toLowerCase())
+    || /(mri|irm|\bpet\b|\bct\b|scanner|\btdm\b|ultrasound|echo|écho|x-ray|xray|radiograph|\bscan\b|imaging|petscan)/.test(n);
+}
+function modalityOf(d){
+  const s=((d.name||'')+' '+(d.cat||'')).toLowerCase();
+  if(/(mri|irm)/.test(s))return 'MRI';
+  if(/\bpet\b|petscan/.test(s))return 'PET / PET-CT';
+  if(/\bct\b|scanner|\btdm\b|thoraci|chest ct/.test(s))return 'CT';
+  if(/(ultrasound|echo|écho|cardiac|sonograph)/.test(s))return 'Ultrasound / Echo';
+  if(/(x-ray|x ray|xray|radiograph|\brx\b)/.test(s))return 'X-ray';
+  return 'Other imaging';
+}
+function vScans(){
+  const scans=(S.docs||[]).filter(isImaging);
+  const order=['MRI','PET / PET-CT','CT','Ultrasound / Echo','X-ray','Other imaging'];
+  const ICON={'MRI':'🧠','PET / PET-CT':'✨','CT':'🫁','Ultrasound / Echo':'🫀','X-ray':'🦴','Other imaging':'🩻'};
+  const groups={}; scans.forEach(d=>{const m=modalityOf(d);(groups[m]=groups[m]||[]).push(d);});
+  const present=order.filter(m=>groups[m]&&groups[m].length);
+  return `
+  <h2 class="title">Scans &amp; Imaging</h2>
+  <p class="sub">Every scan, sorted by type — ${scans.length} imaging item${scans.length===1?'':'s'} across ${present.length} type${present.length===1?'':'s'}. Connect your records folder in <b>Documents</b> to view them here.</p>
+  ${present.length?present.map(m=>`
+    <div class="card"><h3>${ICON[m]||'🩻'} ${esc(m)} <span class="mini">(${groups[m].length})</span></h3>
+      <table><tr><th>Scan</th><th style="width:170px">View</th><th style="width:80px">Type</th></tr>
+      ${groups[m].map(d=>{
+        const key=(baseName(d.path)||d.name||'').toLowerCase();
+        const url=docFiles[key]||docFiles[(d.name||'').toLowerCase()];
+        const isI=['jpg','jpeg','png','gif','webp','heic','bmp'].includes((d.ext||'').toLowerCase());
+        const openHref=url||(/^(file|https?|blob):/.test(d.path||'')?d.path:'');
+        const view=url?`<button class="btn sm" data-prev="${url}" data-ptype="${isI?'img':'pdf'}" data-pname="${esc(d.name)}">👁 Preview</button> <a class="btn sm ghost" href="${url}" target="_blank" rel="noopener">⤢</a>`:(openHref?`<a class="btn sm ghost" href="${esc(openHref)}" target="_blank" rel="noopener">⤢ Open</a>`:`<span class="mini">connect folder ↗</span>`);
+        return `<tr><td><b>${esc(d.name)}</b>${d.snippet?`<div class="mini">${esc(d.snippet.slice(0,110))}…</div>`:''}</td><td>${view}</td><td class="mini">${esc(d.ext||'')}</td></tr>`;
+      }).join('')}
+      </table>
+    </div>`).join(''):`<div class="card"><div class="empty">No scans yet. Add them in <b>Documents</b> — they'll auto-sort here by type.</div></div>`}
+  <div id="docModal" style="display:none;position:fixed;inset:0;background:rgba(20,30,24,.88);z-index:9999;padding:22px">
+    <div style="max-width:1024px;margin:0 auto;height:100%;display:flex;flex-direction:column">
+      <div style="display:flex;justify-content:space-between;align-items:center;color:#fff;margin-bottom:8px;gap:10px">
+        <b id="docModalName" style="font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap"></b>
+        <button class="btn sm" id="docModalClose" style="background:#8a8f8c;flex:none">✕ Close</button>
+      </div>
+      <iframe id="docFrame" style="flex:1;width:100%;border:0;border-radius:10px;background:#fff"></iframe>
+    </div>
+  </div>`;
+}
+
+/* ---------------- CLINICAL TRIALS ---------------- */
+const TSTATUS=[['pursuing','Pursuing 🔥'],['contacted','Contacted ✉️'],['tbd','Eligibility TBD ❓'],['notstarted','Not started'],['ruledout','Ruled out ✕']];
+const TPRIO=[['hi','🔥 Priority'],['med','⭐ Strong potential'],['watch','👁 Watch']];
+const TSCOLOR={pursuing:'#0a8a5f',contacted:'#c88a2e',tbd:'#4a8fa6',notstarted:'#9aa5a0',ruledout:'#8a8f8c'};
+function vTrials(){
+  const trials=(S.trials||[]);
+  const tiers=[['hi','🔥 Tier 1 — pursue now (local / European / recruiting)'],['med','⭐ Tier 2 — strong option'],['watch','👁 Watch / conditional / US-gated']];
+  return `
+  <h2 class="title">Clinical Trials</h2>
+  <p class="sub">Every trial on the table — the ones you're chasing and the ones still worth exploring. ${trials.length} tracked. Change priority or status inline; it saves here.</p>
+  <div class="noprint" style="margin:6px 0 12px"><button class="btn sm" onclick="window.print()">🖨 Print / Save as PDF</button> <span class="mini" style="margin-left:8px">Tiers = priority &amp; accessibility. The <b>Status</b> column shows who's actually been contacted. Verified live vs ClinicalTrials.gov 18 Jul 2026.</span></div>
+  ${tiers.map(([pk,plabel])=>{
+    const list=trials.filter(t=>(t.pr||'med')===pk);
+    if(!list.length)return '';
+    return `<div class="card"><h3>${esc(plabel)} <span class="mini">(${list.length})</span></h3>
+      <table><tr><th>Trial</th><th style="width:14%">Type</th><th style="width:18%">Site / lead</th><th>Why it fits</th><th style="width:120px">Status</th><th style="width:120px">Priority</th><th style="width:22px"></th></tr>
+      ${list.map(t=>`<tr>
+        <td><b>${esc(t.name)}</b>${t.nct?`<div class="mini">${esc(t.nct)}</div>`:''}</td>
+        <td class="mini">${esc(t.mech||'')}</td>
+        <td class="mini">${esc(t.site||'')}${t.contact?`<div>${esc(t.contact)}</div>`:''}</td>
+        <td class="ask" style="font-size:12px">${esc(t.fit||'')}</td>
+        <td><select class="status" data-tstatus="${t.id}" style="background:${TSCOLOR[t.s||'notstarted']||'#9aa5a0'}">${TSTATUS.map(s=>`<option value="${s[0]}" ${t.s===s[0]?'selected':''}>${s[1]}</option>`).join('')}</select></td>
+        <td><select class="f" data-tprio="${t.id}" style="padding:5px 8px">${TPRIO.map(p=>`<option value="${p[0]}" ${(t.pr||'med')===p[0]?'selected':''}>${p[1]}</option>`).join('')}</select></td>
+        <td><button class="del" data-deltrial="${t.id}" title="remove">×</button></td>
+      </tr>`).join('')}
+      </table></div>`;
+  }).join('')}
+  <div class="card"><h3>+ Add a trial</h3>
+    <div class="row"><div style="flex:2;min-width:180px"><label class="lab">Trial name</label><input class="f" id="trName"></div>
+      <div style="flex:1;min-width:120px"><label class="lab">NCT #</label><input class="f" id="trNct" placeholder="NCT…"></div></div>
+    <div class="row"><div style="flex:1;min-width:140px"><label class="lab">Type</label><input class="f" id="trMech" placeholder="CAR-T / vaccine / chemo…"></div>
+      <div style="flex:1;min-width:140px"><label class="lab">Site / lead</label><input class="f" id="trSite"></div></div>
+    <label class="lab">Why it fits</label><input class="f" id="trFit">
+    <div style="margin-top:10px"><button class="btn sm" id="trAdd">+ Add trial</button></div>
+  </div>`;
+}
+
+/* ---------------- QUESTIONS ---------------- */
+function vQuestions(){
+  const cats=Array.from(new Set(S.questions.map(q=>q.c)));
+  return `
+  <h2 class="title">Questions to Ask & Push</h2>
+  <p class="sub">The high-leverage questions that get decisions made <b>on purpose</b> — never skipped by default. Check them off as you ask. Add your own.</p>
+  <div class="banner">Bring these to appointments. The goal isn't to challenge your doctors — it's to make sure every option is <b>consciously chosen or rejected</b>, with a reason you understand.</div>
+  ${cats.map(cat=>`
+    <div class="card"><h3>${esc(cat)}</h3>
+      ${S.questions.filter(q=>q.c===cat).map(q=>`
+        <div class="q${q.done?' checked':''}">
+          <label style="display:flex;align-items:flex-start;cursor:pointer">
+            <input type="checkbox" class="chk" data-q="${q.id}" ${q.done?'checked':''}>
+            <span><span class="qt${q.done?' done':''}">${esc(q.t)}</span><div class="qw">${esc(q.w)}</div></span>
+          </label>
+        </div>`).join('')}
+    </div>`).join('')}
+  <div class="card"><h3>+ Add your own question</h3>
+    <label class="lab">Category</label><input class="f" id="nqCat" placeholder="e.g. The treatment plan">
+    <label class="lab">Question</label><input class="f" id="nqT" placeholder="What do you want to ask?">
+    <label class="lab">Why it matters (optional)</label><input class="f" id="nqW" placeholder="note to yourself">
+    <div style="margin-top:10px"><button class="btn sm" id="nqAdd">+ Add question</button></div>
+  </div>`;
+}
+
+/* ---------------- OUTREACH ---------------- */
+function vOutreach(){
+  const cats=Array.from(new Set(S.outreach.map(o=>o.cat)));
+  return `
+  <h2 class="title">Outreach Tracker</h2>
+  <p class="sub">Everyone who can help — experts, trials, foundations — and who's replied. Nothing gets forgotten.</p>
+  ${cats.map(cat=>`
+    <div class="card"><h3>${esc(cat)}</h3>
+      <table><tr><th style="width:22%">Who</th><th style="width:26%">Contact</th><th>Ask</th><th style="width:120px">Status</th><th></th></tr>
+      ${S.outreach.filter(o=>o.cat===cat).map(o=>`<tr>
+        <td><input class="f" data-o="${o.id}" data-of="who" value="${esc(o.who)}" style="padding:5px 8px"></td>
+        <td><input class="f" data-o="${o.id}" data-of="contact" value="${esc(o.contact)}" placeholder="email / phone" style="padding:5px 8px"></td>
+        <td><input class="f" data-o="${o.id}" data-of="ask" value="${esc(o.ask)}" style="padding:5px 8px"></td>
+        <td><select class="status st-${o.s}" data-ostatus="${o.id}">${STATUSES.map(s=>`<option value="${s[0]}" ${o.s===s[0]?'selected':''}>${s[1]}</option>`).join('')}</select></td>
+        <td style="white-space:nowrap"><button class="del" data-emailo="${o.id}" style="color:var(--greendk);font-size:15px" title="Read / write the email">📄${o.email?'':'＋'}</button> <button class="del" data-delo="${o.id}" title="remove">×</button></td></tr>`).join('')}
+      </table>
+    </div>`).join('')}
+  <div class="card"><h3>+ Add a contact</h3>
+    <div class="row">
+      <div style="flex:1;min-width:150px"><label class="lab">Category</label><input class="f" id="noCat" placeholder="e.g. Second opinions"></div>
+      <div style="flex:1;min-width:150px"><label class="lab">Who</label><input class="f" id="noWho" placeholder="name / center"></div>
+    </div>
+    <label class="lab">Contact</label><input class="f" id="noContact" placeholder="email / phone / portal">
+    <label class="lab">The ask</label><input class="f" id="noAsk" placeholder="what you want from them">
+    <div style="margin-top:10px"><button class="btn sm" id="noAdd">+ Add contact</button></div>
+  </div>`;
+}
+
+/* ---------------- CARE TEAM (consortium + CC builder) ---------------- */
+function vTeam(){
+  const people=(S.people||[]);
+  const groups=[];people.forEach(p=>{if(groups.indexOf(p.group)<0)groups.push(p.group);});
+  return `
+  <h2 class="title">Care Team &amp; Consortium</h2>
+  <p class="sub">Everyone in your child's orbit — oncologists, surgeons, radiation, cell-therapy teams, second opinions, fertility, navigation, family. <b>Tick people to build a CC list</b>, then copy it straight into your email.</p>
+  <div class="card" style="position:sticky;top:6px;z-index:4">
+    <h3>✉️ CC builder — <span class="mini" id="ccCount">0 selected</span></h3>
+    <textarea id="ccOut" class="f" readonly rows="2" placeholder="Tick people below and their emails collect here — ready to paste into the CC field." style="font-family:ui-monospace,monospace;font-size:12px"></textarea>
+    <div style="margin-top:8px;display:flex;gap:7px;flex-wrap:wrap">
+      <button class="btn sm" id="ccCopy">📋 Copy CC</button>
+      <button class="btn sm" id="ccClear" style="background:#8a8f8c">Clear</button>
+      ${groups.map(g=>`<button class="btn sm" data-ccgroup="${esc(g)}" style="background:var(--greendk)">+ ${esc(g)}</button>`).join('')}
+    </div>
+  </div>
+  ${groups.length?groups.map(g=>`
+    <div class="card"><h3>${esc(g)} <button class="btn sm" data-ccgroup="${esc(g)}" style="float:right;background:var(--greendk)">+ CC all</button></h3>
+      <table><tr><th style="width:30px"></th><th style="width:28%">Name</th><th>Role</th><th style="width:28%">Contact</th><th style="width:24px"></th></tr>
+      ${people.filter(p=>p.group===g).map(p=>`<tr>
+        <td>${p.email?`<input type="checkbox" class="ccbox" data-cc="${esc(p.email)}">`:''}</td>
+        <td><b>${esc(p.name)}</b>${p.status?` <span class="mini">${esc(p.status)}</span>`:''}</td>
+        <td>${esc(p.role||'')}${p.org?` <span class="mini">· ${esc(p.org)}</span>`:''}${p.note?`<div class="mini">${esc(p.note)}</div>`:''}</td>
+        <td>${p.email?`<a href="mailto:${esc(p.email)}">${esc(p.email)}</a>`:''}${p.phone?`<div class="mini">${esc(p.phone)}</div>`:''}</td>
+        <td><button class="del" data-delp="${p.id}" title="remove">×</button></td>
+      </tr>`).join('')}
+      </table>
+    </div>`).join(''):'<div class="card"><p class="sub">No people yet — add your child\'s care team below.</p></div>'}
+  <div class="card"><h3>+ Add someone</h3>
+    <div class="row">
+      <div style="flex:1;min-width:140px"><label class="lab">Name</label><input class="f" id="tpName" placeholder="Dr. …"></div>
+      <div style="flex:1;min-width:140px"><label class="lab">Group</label><input class="f" id="tpGroup" placeholder="e.g. Second opinions"></div>
+    </div>
+    <div class="row">
+      <div style="flex:1;min-width:140px"><label class="lab">Role</label><input class="f" id="tpRole" placeholder="e.g. Oncologist"></div>
+      <div style="flex:1;min-width:140px"><label class="lab">Org</label><input class="f" id="tpOrg" placeholder="hospital / center"></div>
+    </div>
+    <label class="lab">Email</label><input class="f" id="tpEmail" placeholder="name@hospital.org">
+    <label class="lab">Phone <span class="mini">(optional)</span></label><input class="f" id="tpPhone">
+    <div style="margin-top:10px"><button class="btn sm" id="tpAdd">+ Add to team</button></div>
+  </div>`;
+}
+
+/* ---------------- BOARD (kanban) ---------------- */
+const KCOLORS={notstarted:'#9aa5a0',drafted:'#c88a2e',sent:'#2f7fb8',replied:'#0a8a5f',meeting:'#6b4fc4',noreply:'#c0562e',declined:'#8a8f8c',pending:'#4a8fa6'};
+function vBoard(){
+  return `
+  <h2 class="title">Outreach Board</h2>
+  <p class="sub">Every person you're working, laid out by where they stand. <b>Drag a card</b> to move it as things progress — when someone replies, when a meeting is set. This is your at-a-glance command view of the whole back-and-forth.</p>
+  <div class="banner">Each card is a contact from your Outreach list. Drag between columns to update status. Click <b>📄</b> on a card to read/write the email and log what happened.</div>
+  <div class="kanban">
+    ${STATUSES.map(s=>{
+      const col=S.outreach.filter(o=>o.s===s[0]);
+      const color=KCOLORS[s[0]]||'#9aa5a0';
+      return `<div class="kcol" data-kcol="${s[0]}">
+        <div class="khead" style="background:${color}"><span>${esc(s[1])}</span><span>${col.length}</span></div>
+        <div class="kbody" data-kbody="${s[0]}">
+          ${col.length?col.map(o=>{
+            const last=(o.log&&o.log.length)?o.log[o.log.length-1]:null;
+            return `<div class="kcard" draggable="true" data-kcard="${o.id}">
+              <div class="kwho">${esc(o.who||'—')}</div>
+              <div class="kask">${esc(o.ask||'')}</div>
+              <div class="kfoot"><span class="mini">${esc(o.cat||'')}</span>
+                <button class="del" data-emailo="${o.id}" style="color:var(--greendk);font-size:14px" title="Read / write email + log">📄</button></div>
+              ${last?`<div class="klast">🕑 ${esc(last.date||'')} — ${esc(last.note||'')}</div>`:''}
+            </div>`;
+          }).join(''):'<div class="kempty">— none —</div>'}
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+/* ---------------- AI ASSIST ---------------- */
+function chatBubble(m){
+  const you=m.role==='user';
+  const files=(m.files||[]).map(f=>`<div style="font-size:11px;opacity:.9">📎 ${esc(f.name)}</div>`).join('');
+  const thumbs=(m.images||[]).map(u=>`<img src="${u}" style="max-width:130px;max-height:130px;border-radius:8px;margin:2px 2px 0 0">`).join('');
+  return `<div style="align-self:${you?'flex-end':'flex-start'};max-width:86%;background:${you?'#0a8a5f':'#eef3f0'};color:${you?'#fff':'#1a2b23'};padding:9px 13px;border-radius:15px;font-size:14px;line-height:1.55;white-space:pre-wrap;word-break:break-word">${files}${thumbs?`<div style="margin-bottom:5px">${thumbs}</div>`:''}${esc(m.content)}</div>`;
+}
+function sysPrompt(){
+  const p=S.profile||{}; const fights=(S.fights||[]).map(f=>'- '+f.title).join('\n');
+  return `You are a warm, steady companion inside "Bloom", a private app used by a parent whose child is fighting cancer while the parent also fights for the right to see their child. This parent is carrying something almost unbearable.
+
+Be part gentle listener, part practical help:
+- Be human first. Validate feelings. Don't rush to fix, don't lecture, no clinical or corporate language, no toxic positivity. Keep it short, warm, and real.
+- It is okay to just sit with them in something hard.
+- When they ask you to help think something through (medical, logistical, legal, emotional), help clearly using the context below — but never make definitive medical or legal decisions for them; gently point those back to their care team or lawyer.
+- Never minimise what they are going through.
+- If they express thoughts of self-harm, hopelessness, or not being able to go on: gently and directly encourage them to reach a real person right now (in Belgium: 107 Télé-Accueil, free and 24/7; or 112 for emergencies), and stay present with them.
+- You are an AI companion, not a therapist or doctor — be honest about that if it matters.
+
+What you know (may be incomplete):
+Child: ${p.child||'their child'}. Diagnosis: ${p.dx||'—'}. Current: ${p.current||'—'}.
+The fights they are carrying:
+${fights||'—'}
+
+If the parent expresses faith, prays, or asks for spiritual strength, you may gently offer comfort rooted in Scripture (Old and New Testament) — a fitting verse and a short prayer — humbly and never preachy, always following their lead. There is also a "Faith & Strength" section in the app with Scripture and prayers for hard moments.
+
+Keep replies fairly short unless they clearly want more depth.`;
+}
+let pendingAtt=[]; // pre-send attachments: {name, kind:'text'|'image', text?, dataUrl?}
+async function addAttachments(fileList){
+  for(const f of [...fileList]){
+    const ext=(f.name.split('.').pop()||'').toLowerCase();
+    if(['png','jpg','jpeg','gif','webp','bmp'].includes(ext)||/^image\//.test(f.type)){
+      const dataUrl=await new Promise(res=>{const r=new FileReader();r.onload=()=>res(r.result);r.readAsDataURL(f);});
+      pendingAtt.push({name:f.name,kind:'image',dataUrl});
+    } else if(['txt','md','csv','json','rtf','log','html','xml'].includes(ext)||/^text\//.test(f.type)){
+      let txt=await f.text(); if(txt.length>24000)txt=txt.slice(0,24000)+'\n…(truncated)';
+      pendingAtt.push({name:f.name,kind:'text',text:txt});
+    } else {
+      pendingAtt.push({name:f.name,kind:'text',text:'('+ext.toUpperCase()+' file — its contents can\'t be read here. For a PDF report, paste the text; for a scan, attach a PNG/JPG image.)'});
+    }
+  }
+  render();
+}
+async function callAI(){
+  const ai=S.ai||{}, chat=S.chat||[], sys=sysPrompt();
+  const filesToText=m=>(m.files||[]).map(f=>`\n\n[Attached document: ${f.name}]\n${f.text}`).join('');
+  if(ai.backend==='claude'){
+    if(!ai.claudeKey) throw new Error('add your Anthropic API key in setup');
+    const msgs=chat.map(m=>{ if(m.role!=='user')return {role:m.role,content:m.content};
+      const parts=[{type:'text',text:(m.content||'')+filesToText(m)}];
+      (m.images||[]).forEach(u=>{const mt=(u.match(/^data:(.*?);base64,/)||[])[1]||'image/png';parts.push({type:'image',source:{type:'base64',media_type:mt,data:u.split(',')[1]}});});
+      return {role:'user',content:parts}; });
+    const r=await fetch('https://api.anthropic.com/v1/messages',{method:'POST',headers:{'content-type':'application/json','x-api-key':ai.claudeKey,'anthropic-version':'2023-06-01','anthropic-dangerous-direct-browser-access':'true'},body:JSON.stringify({model:ai.claudeModel||'claude-3-5-sonnet-latest',max_tokens:1500,system:sys,messages:msgs})});
+    if(!r.ok) throw new Error('Claude '+r.status+' (check key/model)');
+    const j=await r.json(); return (j.content||[]).map(c=>c.text).join('');
+  }
+  if(ai.backend==='openai'){
+    if(!ai.openaiKey) throw new Error('add your OpenAI API key in setup');
+    const msgs=[{role:'system',content:sys},...chat.map(m=>{ if(m.role!=='user')return {role:m.role,content:m.content};
+      if((m.images||[]).length){ const parts=[{type:'text',text:(m.content||'')+filesToText(m)}]; (m.images||[]).forEach(u=>parts.push({type:'image_url',image_url:{url:u}})); return {role:'user',content:parts}; }
+      return {role:'user',content:(m.content||'')+filesToText(m)}; })];
+    const r=await fetch('https://api.openai.com/v1/chat/completions',{method:'POST',headers:{'content-type':'application/json','Authorization':'Bearer '+ai.openaiKey},body:JSON.stringify({model:ai.openaiModel||'gpt-4o-mini',messages:msgs})});
+    if(!r.ok) throw new Error('OpenAI '+r.status+' (check key/model)');
+    const j=await r.json(); return j.choices[0].message.content;
+  }
+  const msgs=[{role:'system',content:sys},...chat.map(m=>{ const o={role:m.role,content:(m.content||'')+(m.role==='user'?filesToText(m):'')}; if(m.role==='user'&&(m.images||[]).length)o.images=m.images.map(u=>u.split(',')[1]); return o; })];
+  const r=await fetch('http://localhost:11434/api/chat',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({model:(ai.ollamaModel||'llama3.2:3b'),messages:msgs,stream:false})});
+  if(!r.ok) throw new Error('Ollama '+r.status);
+  const j=await r.json(); return j.message.content;
+}
+async function chatSend(){
+  const el=document.getElementById('chatIn'); const text=el?el.value.trim():'';
+  if(!text && !pendingAtt.length) return;
+  const files=pendingAtt.filter(a=>a.kind==='text').map(a=>({name:a.name,text:a.text}));
+  const images=pendingAtt.filter(a=>a.kind==='image').map(a=>a.dataUrl);
+  S.chat=S.chat||[]; S.chat.push({role:'user',content:text||'(shared an attachment)',files,images}); pendingAtt=[]; save(); render();
+  const log=document.getElementById('chatLog');
+  if(log){const t=document.createElement('div');t.textContent='… thinking';t.style.cssText='align-self:flex-start;color:#9aa;padding:6px 10px';log.appendChild(t);log.scrollTop=log.scrollHeight;}
+  try{ const reply=await callAI(); S.chat.push({role:'assistant',content:(reply||'(no reply)').trim()}); }
+  catch(e){ S.chat.push({role:'assistant',content:"I couldn't reach the AI just now — "+(e.message||e)+".\n\nCheck “change / set up” below. Note: to actually read a scan image, the engine needs a vision model — your current local model is text-only (see the 📎 note)."}); }
+  save(); render();
+  const l2=document.getElementById('chatLog'); if(l2) l2.scrollTop=l2.scrollHeight;
+}
+function vAssist(){
+  const chat=S.chat||[]; const ai=S.ai||{};
+  const label = ai.backend==='claude'?'Claude (your key)':ai.backend==='openai'?'OpenAI (your key)':'Local · private (Ollama)';
+  return `
+  <h2 class="title">Talk it through</h2>
+  <p class="sub">A private place to talk when it's heavy — or to help you think something through. It knows your notes, and it runs on <b>your</b> machine or <b>your</b> AI key, so nothing here leaves your control.</p>
+  <div class="banner">💚 A caring AI companion — <b>not</b> a therapist or doctor. If things feel unbearable or you have thoughts of harming yourself, please reach a real person now: in Belgium, <b>107</b> (Télé-Accueil, free, 24/7) or <b>112</b> for emergencies. You should not be alone with this.</div>
+  <div class="card">
+    <div id="chatLog" style="max-height:50vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px">
+      ${chat.length? chat.map(m=>chatBubble(m)).join('') : `<div class="mini" style="text-align:center;padding:26px 10px;line-height:1.6">However you're feeling right now, you can just start typing.<br>I'm here — no rush, no judgment. 🌱</div>`}
+    </div>
+    ${pendingAtt.length?`<div style="display:flex;flex-wrap:wrap;gap:6px;margin-top:10px">${pendingAtt.map((a,i)=>`<span style="background:#eef3f0;border:1px solid #d7e6de;border-radius:8px;padding:3px 8px;font-size:11.5px">${a.kind==='image'?'🖼️':'📎'} ${esc(a.name)} <a href="#" data-rmatt="${i}" style="color:#c0562e;text-decoration:none">×</a></span>`).join('')}</div>`:''}
+    <div style="display:flex;gap:8px;margin-top:10px;align-items:flex-end">
+      <button class="btn ghost" id="chatAttach" title="Attach a scan image or a text report" style="height:46px;padding:0 12px">📎</button>
+      <input type="file" id="chatFiles" multiple accept="image/*,.txt,.md,.csv,.json,.rtf,.pdf,.log,.xml,.html" style="display:none">
+      <textarea id="chatIn" placeholder="Say anything… how you're doing, ask me to help you think, or attach a scan / report." style="flex:1;min-height:52px;max-height:150px;border:1px solid #d6ded9;border-radius:12px;padding:11px 13px;font-size:14px;font-family:inherit;line-height:1.5;resize:vertical"></textarea>
+      <button class="btn" id="chatSend" style="height:46px;white-space:nowrap">Send</button>
+    </div>
+    <p class="mini" style="margin-top:6px">📎 Attach a <b>scan image (PNG/JPG)</b> or a <b>text report</b> and ask about it. Reading images needs a <b>vision model</b> (local: <code>ollama pull llava</code>, then set it in setup; or use Claude/OpenAI). <i>Any AI reading of a scan is only to help you understand it — never a diagnosis. Your doctors read the images.</i></p>
+    <div class="mini" style="margin-top:8px;display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+      <span>Engine: <b>${esc(label)}</b> · <a href="#" id="aiSetupToggle" style="color:var(--greendk)">change / set up</a></span>
+      ${chat.length?'<a href="#" id="chatClear" style="color:var(--muted)">clear conversation</a>':''}
+    </div>
+  </div>
+  <div class="card" id="aiSetup" style="display:none">
+    <h3>Set up your companion</h3>
+    <p class="mini"><b>Local</b> keeps everything 100% on your Mac — nothing ever leaves. The API-key options are smarter, but your messages go to that provider.</p>
+    <label class="lab">Engine</label>
+    <select class="f" id="aiBackend">
+      <option value="ollama" ${ai.backend==='ollama'?'selected':''}>Local model — private, on your Mac (Ollama)</option>
+      <option value="claude" ${ai.backend==='claude'?'selected':''}>Claude — your Anthropic API key</option>
+      <option value="openai" ${ai.backend==='openai'?'selected':''}>OpenAI — your API key</option>
+    </select>
+    <div id="setOllama" style="${ai.backend==='ollama'?'':'display:none'}">
+      <label class="lab">Ollama model <span class="mini">(run <code>ollama list</code> to see what you have)</span></label>
+      <input class="f" id="aiOllamaModel" value="${esc(ai.ollamaModel||'llama3.2:3b')}" placeholder="e.g. llama3.2">
+      <p class="mini" style="margin-top:8px">One-time setup so this page may talk to Ollama — in Terminal:<br><code>launchctl setenv OLLAMA_ORIGINS "*"</code><br>then quit &amp; reopen Ollama (or run <code>OLLAMA_ORIGINS=* ollama serve</code>).</p>
+    </div>
+    <div id="setClaude" style="${ai.backend==='claude'?'':'display:none'}">
+      <label class="lab">Anthropic API key</label>
+      <input class="f" id="aiClaudeKey" type="password" value="${esc(ai.claudeKey||'')}" placeholder="sk-ant-…">
+      <label class="lab">Model</label><input class="f" id="aiClaudeModel" value="${esc(ai.claudeModel||'claude-3-5-sonnet-latest')}">
+    </div>
+    <div id="setOpenai" style="${ai.backend==='openai'?'':'display:none'}">
+      <label class="lab">OpenAI API key</label>
+      <input class="f" id="aiOpenaiKey" type="password" value="${esc(ai.openaiKey||'')}" placeholder="sk-…">
+      <label class="lab">Model</label><input class="f" id="aiOpenaiModel" value="${esc(ai.openaiModel||'gpt-4o-mini')}">
+    </div>
+    <div style="margin-top:12px"><button class="btn sm" id="aiSave">Save</button></div>
+  </div>
+  <div class="card"><h3>Or: build a briefing to paste into another AI</h3>
+    <div class="row"><button class="btn ghost" id="genPrompt">🧠 Build my briefing</button><button class="btn ghost" id="copyPrompt">📋 Copy</button></div>
+    <pre id="promptOut" style="margin-top:14px">Click "Build my briefing" to generate.</pre>
+  </div>`;
+}
+
+/* ---------------- FAITH & STRENGTH ---------------- */
+function vFaith(){
+  return `
+  <h2 class="title">Faith & Strength</h2>
+  <p class="sub">For the moments this road brings you to your knees — a word from Scripture, and a prayer, to steady you. Old Testament and New. You are not walking this alone.</p>
+  <div class="banner">🕊️ <i>"The Lord is near to the brokenhearted, and saves the crushed in spirit."</i> — Psalm 34:18</div>
+
+  <div class="card"><h3>😨 When fear grips you</h3>
+    <p style="font-size:14px;line-height:1.65"><i>"Fear not, for I am with you; be not dismayed, for I am your God; I will strengthen you, I will help you, I will uphold you with my righteous right hand."</i> — Isaiah 41:10<br><br>
+    <i>"Be strong and courageous. Do not be afraid… for the Lord your God is with you wherever you go."</i> — Joshua 1:9</p>
+    <p class="mini"><b>Prayer:</b> Lord, this fear is bigger than I am. Take it from my hands. Stand between me and everything I dread, and let me feel that You are near. Amen.</p></div>
+
+  <div class="card"><h3>😮‍💨 When you're too weary to go on</h3>
+    <p style="font-size:14px;line-height:1.65"><i>"He gives power to the faint, and to him who has no might he increases strength… they who wait for the Lord shall renew their strength; they shall mount up with wings like eagles; they shall run and not be weary; they shall walk and not faint."</i> — Isaiah 40:29–31<br><br>
+    <i>"Come to me, all who labor and are heavy laden, and I will give you rest."</i> — Matthew 11:28</p>
+    <p class="mini"><b>Prayer:</b> Father, I have nothing left. Carry what I can't. Give me strength for just today — not the whole war, only tomorrow. Let me lay this weight at Your feet and rest. Amen.</p></div>
+
+  <div class="card"><h3>⏳ Waiting — for results, for news, for the door to open</h3>
+    <p style="font-size:14px;line-height:1.65"><i>"God is our refuge and strength, a very present help in trouble… Be still, and know that I am God."</i> — Psalm 46:1,10<br><br>
+    <i>"Do not be anxious about anything, but in everything by prayer and supplication with thanksgiving let your requests be made known to God. And the peace of God, which surpasses all understanding, will guard your hearts and your minds."</i> — Philippians 4:6–7</p>
+    <p class="mini"><b>Prayer:</b> Lord, the waiting is its own kind of pain. Quiet my racing heart. Whatever the news, let me know You are already there in it, ahead of me. Give me Your peace that I cannot explain. Amen.</p></div>
+
+  <div class="card"><h3>🌑 In the valley — facing the worst</h3>
+    <p style="font-size:14px;line-height:1.65"><i>"Even though I walk through the valley of the shadow of death, I will fear no evil, for you are with me; your rod and your staff, they comfort me."</i> — Psalm 23:4<br><br>
+    <i>"When you pass through the waters, I will be with you; and through the rivers, they shall not overwhelm you."</i> — Isaiah 43:2</p>
+    <p class="mini"><b>Prayer:</b> Shepherd, we are in the valley. I can't see the way out. But You are here in the dark with us — walk us through. Do not let the waters overwhelm my child. Amen.</p></div>
+
+  <div class="card"><h3>💔 Grieving — missing your child, aching with love</h3>
+    <p style="font-size:14px;line-height:1.65"><i>"He heals the brokenhearted and binds up their wounds."</i> — Psalm 147:3<br><br>
+    <i>"You have kept count of my tossings; put my tears in your bottle. Are they not in your book?"</i> — Psalm 56:8</p>
+    <p class="mini"><b>Prayer:</b> Lord, You see every tear — none of them are wasted. Hold my child close when I can't. Let the love I can't deliver reach him another way. Bind up this wound in me. Amen.</p></div>
+
+  <div class="card"><h3>🔥 When it feels unjust and you're angry</h3>
+    <p style="font-size:14px;line-height:1.65"><i>"The Lord is a stronghold for the oppressed, a stronghold in times of trouble."</i> — Psalm 9:9<br><br>
+    <i>"Beloved, never avenge yourselves, but leave it to the wrath of God… 'Vengeance is mine, I will repay, says the Lord.'"</i> — Romans 12:19</p>
+    <p class="mini"><b>Prayer:</b> God, You see what is being done, and what is unfair. I give You my anger before it poisons me. Be the defender of my child and of what is right. I trust You to set it straight. Amen.</p></div>
+
+  <div class="card"><h3>🛡️ Courage to keep fighting for your child</h3>
+    <p style="font-size:14px;line-height:1.65"><i>"Be strong and courageous. Do not fear or be in dread… for it is the Lord your God who goes with you. He will not leave you or forsake you."</i> — Deuteronomy 31:6<br><br>
+    <i>"The joy of the Lord is your strength."</i> — Nehemiah 8:10</p>
+    <p class="mini"><b>Prayer:</b> Lord, make me strong for this fight — clear-headed, bold, unwilling to give up on my child. Go before me into every room, every appointment, every hearing. Let no good door stay closed. Amen.</p></div>
+
+  <div class="card"><h3>🙏 For your child — healing and protection</h3>
+    <p style="font-size:14px;line-height:1.65"><i>"For you formed my inward parts; you knitted me together in my mother's womb. I praise you, for I am fearfully and wonderfully made."</i> — Psalm 139:13–14<br><br>
+    <i>"Do not fear, only believe."</i> — Mark 5:36<br><br>
+    <i>"'For I know the plans I have for you,' declares the Lord, 'plans for welfare and not for evil, to give you a future and a hope.'"</i> — Jeremiah 29:11</p>
+    <p class="mini"><b>Prayer:</b> Lord, You knit my child together and know every cell of him. Heal his body. Guard his spirit. Give his doctors wisdom and his treatments power. Write for him a future and a hope. Into Your hands I place him. Amen.</p></div>
+
+  <div class="card"><h3>🌙 When you can't sleep</h3>
+    <p style="font-size:14px;line-height:1.65"><i>"In peace I will both lie down and sleep; for you alone, O Lord, make me dwell in safety."</i> — Psalm 4:8<br><br>
+    <i>"The steadfast love of the Lord never ceases; his mercies never come to an end; they are new every morning; great is your faithfulness."</i> — Lamentations 3:22–23<br><br>
+    <i>"Weeping may tarry for the night, but joy comes with the morning."</i> — Psalm 30:5</p>
+    <p class="mini"><b>Prayer:</b> Lord of the night hours, quiet my mind. Watch over my child while I cannot. Let me rest in the truth that Your mercies will be new when the sun comes up. Amen.</p></div>
+
+  <div class="card"><h3>🕯️ Grace — when you feel you've fallen short</h3>
+    <p style="font-size:14px;line-height:1.65"><i>"If we confess our sins, he is faithful and just to forgive us our sins and to cleanse us from all unrighteousness."</i> — 1 John 1:9<br><br>
+    <i>"Create in me a clean heart, O God, and renew a right spirit within me."</i> — Psalm 51:10<br><br>
+    <i>"My grace is sufficient for you, for my power is made perfect in weakness."</i> — 2 Corinthians 12:9</p>
+    <p class="mini"><b>Prayer:</b> Lord, I lay my shortcomings before You. I don't have to be perfect to be held — Your grace is a gift, not a wage. Make my heart clean, and be strong in my weakness. Lift me. I need You. Amen.</p></div>
+
+  <div class="card"><h3>🌷 Gratitude — for the good moments, the small mercies</h3>
+    <p style="font-size:14px;line-height:1.65"><i>"Bless the Lord, O my soul, and forget not all his benefits, who forgives all your iniquity, who heals all your diseases."</i> — Psalm 103:2–3<br><br>
+    <i>"Give thanks in all circumstances; for this is the will of God in Christ Jesus for you."</i> — 1 Thessalonians 5:18</p>
+    <p class="mini"><b>Prayer:</b> Thank You, Lord — for this breath, this day, this moment with my child, this small mercy I almost missed. In the middle of the hard, You are still good. Amen.</p></div>
+
+  <div class="card"><h3>✝️ The promise to hold onto</h3>
+    <p style="font-size:14px;line-height:1.65"><i>"For I am sure that neither death nor life… nor things present nor things to come… will be able to separate us from the love of God."</i> — Romans 8:38–39<br><br>
+    <i>"In the world you will have tribulation. But take heart; I have overcome the world."</i> — John 16:33</p>
+    <p class="mini"><b>Whatever comes, nothing can separate you or your child from the love of God. Take heart.</b></p></div>
+
+  <p class="mini" style="text-align:center;margin-top:16px">Scripture is offered here as comfort for any parent who finds strength in it. 🕊️</p>`;
+}
+
+/* ---------------- ABOUT ---------------- */
+function vAbout(){
+  return `
+  <h2 class="title">About & Privacy</h2>
+  <p class="sub">Built with love by a parent who has walked this road — for every family who comes next.</p>
+  <div class="banner"><b>🔒 Your data never leaves this computer.</b> This is a single web page running locally. There is no server, no account, no cloud we control. Your entries save to this browser's private storage; your documents are read on this machine and never uploaded anywhere.</div>
+  <div class="card"><h3>🗺️ Where everything lives (and how it connects)</h3>
+    <p class="mini">Everything you have sits in one of four places — <b>all of them yours</b>. No outside company holds your data for you.</p>
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:10px;margin-top:10px">
+      <div style="background:#eef7f2;border:1px solid #d7e6de;border-radius:12px;padding:12px">
+        <div style="font-weight:800;color:#0a5137">🖥️ This Mac</div>
+        <div class="mini" style="margin-top:4px;line-height:1.6">• <b>Bloom app</b> — the page you're using<br>• <b>Your Bloom data</b> — profile, timeline, board, chat (this browser)<br>• <b>The AI companion</b> — Ollama, running locally</div>
+      </div>
+      <div style="background:#eef3f7;border:1px solid #d7dfe6;border-radius:12px;padding:12px">
+        <div style="font-weight:800;color:#0a5137">☁️ Your iCloud</div>
+        <div class="mini" style="margin-top:4px;line-height:1.6">• <b>Backup copy</b> of Bloom + your data<br>• Your private <b>Bloom backup</b> folder<br>• Syncs to your other devices</div>
+      </div>
+      <div style="background:#f7f3ee;border:1px solid #e6ddd7;border-radius:12px;padding:12px">
+        <div style="font-weight:800;color:#0a5137">📁 Your Google Drive</div>
+        <div class="mini" style="margin-top:4px;line-height:1.6">• <b>Your child's records</b> (the folder you connect)<br>• <b>Scans / imaging</b><br>• Shared by link only with the doctors you choose</div>
+      </div>
+      <div style="background:#f7eef2;border:1px solid #e6d7de;border-radius:12px;padding:12px">
+        <div style="font-weight:800;color:#0a5137">✉️ Your Gmail</div>
+        <div class="mini" style="margin-top:4px;line-height:1.6">• All <b>outreach emails</b> + replies<br>• The record of who's been contacted<br>• Mirrored in Bloom's Outreach board</div>
+      </div>
+    </div>
+    <p class="mini" style="margin-top:10px">Bloom is the <b>hub</b>: it pulls in your documents (from this Mac or Drive), tracks your outreach (which lives in Gmail), and talks to your local AI. Nothing is sent to us, ever.</p>
+  </div>
+  <div class="card"><h3>Back up / move your data</h3>
+    <p style="font-size:13.5px">Your work lives in this browser. To keep a copy (or move to another device), export it to a file — save it in your own folder or Google Drive. Import it anywhere to restore.</p>
+    <div class="row"><button class="btn ghost sm" id="exportBtn">⬇️ Export my data (.json)</button><button class="btn ghost sm" id="importBtn">⬆️ Import data</button></div>
+  </div>
+  <div class="card"><h3>Important</h3>
+    <p style="font-size:13.5px">This toolkit helps you <b>organise information and questions</b> to bring to your child's real doctors and lawyers. It is <b>not medical or legal advice</b>, and it does not diagnose or treat. Always rely on your qualified care team for decisions.</p>
+    <p class="mini">Bloom · open source (MIT) · created by AP / AutomateScale / PalmerLewis · you are free to copy, adapt, and share it.</p>
+  </div>`;
+}
+
+/* ---------------- helpers ---------------- */
+function today(){const d=new Date();return d.toISOString().slice(0,10);}
+function daysTo(ds){const d=(new Date(ds)-new Date(today()))/864e5;if(isNaN(d))return '';if(d<0)return Math.abs(Math.round(d))+' days ago';if(d===0)return 'today';return 'in '+Math.round(d)+' days';}
+function catGuess(name){const n=name.toLowerCase();
+  if(/dicom|\.dcm|dicomdir/.test(n))return 'Imaging — scans (raw)';
+  if(/path|biops|histo|anatomo/.test(n))return 'Diagnosis & pathology';
+  if(/genet|molecul|ngs|fusion|fish|\bdna\b|\brna\b|inform|ghent|gand|ewsr|etv1|fli1/.test(n))return 'Genetics & molecular';
+  if(/lab|blood|cbc|bloods|\bnfs\b|prise de sang/.test(n))return 'Labs';
+  if(/opinion|mora|meyers|dubois|janeway|dirksen|second|avis/.test(n))return 'Second opinions';
+  if(/\bmri\b|\birm\b|\bct\b|\bpet\b|\btep\b|scan|scanner|thorax|radiolog|report|rapport/.test(n))return 'Imaging — reports';
+  if(/protocol|treatment|traitement|chemo|regimen|radio|vinorelb|regorafenib|cyclophosph|maintenance|\brt\b/.test(n))return 'Treatment & radiotherapy';
+  if(/consult|letter|courrier|attest|\bnote\b/.test(n))return 'Doctor letters & consultations';
+  if(/\bfss\b|insurance|funding|facture|remboursement|solidarit|invoice|mutuelle/.test(n))return 'Insurance & funding';
+  if(/translat|traduction|traduit/.test(n))return 'Translated & master records';
+  if(/legal|court|custody|avocat|jugement|tribunal/.test(n))return 'Legal';
+  return 'Uncategorised';}
+
+async function ingest(files){
+  const arr=[...files];
+  S.folderName=S.folderName|| (arr[0]&&arr[0].webkitRelativePath? arr[0].webkitRelativePath.split('/')[0] : 'My files');
+  let i=S.docs.length;
+  for(const f of arr){
+    if(f.name.startsWith('.'))continue;
+    const ext=(f.name.split('.').pop()||'').toLowerCase();
+    docFiles[f.name.toLowerCase()]=URL.createObjectURL(f);   // live preview handle (session only)
+    // link this file to an already-listed record (seeded or added) by filename
+    if(S.docs.some(d=>baseName(d.path).toLowerCase()===f.name.toLowerCase() || (d.name||'').toLowerCase()===f.name.toLowerCase())){continue;}
+    if(!DOCEXT.includes(ext))continue;                        // skip DICOM & non-document files (don't flood the list)
+    const rel=f.webkitRelativePath||f.name;
+    if(S.docs.some(d=>d.path===rel))continue;
+    let snippet='';
+    if(['txt','md','csv','json','rtf'].includes(ext)){try{snippet=(await f.text()).replace(/\s+/g,' ').trim().slice(0,600);}catch(e){}}
+    S.docs.push({id:'d'+(i++),name:f.name,path:rel,ext,size:f.size,cat:catGuess(f.name),snippet});
+  }
+  save();render();
+}
+
+function wire(){
+  // care team — CC builder
+  const rebuildCC=()=>{
+    const em=[...new Set([...document.querySelectorAll('.ccbox:checked')].map(b=>b.dataset.cc))];
+    const o=document.getElementById('ccOut');if(o)o.value=em.join(', ');
+    const c=document.getElementById('ccCount');if(c)c.textContent=em.length+' selected';
+  };
+  document.querySelectorAll('.ccbox').forEach(b=>b.onchange=rebuildCC);
+  document.querySelectorAll('[data-ccgroup]').forEach(btn=>btn.onclick=()=>{
+    (S.people||[]).filter(p=>p.group===btn.dataset.ccgroup&&p.email).forEach(p=>{
+      const box=document.querySelector('.ccbox[data-cc="'+p.email+'"]');if(box)box.checked=true;});
+    rebuildCC();});
+  const ccCopy=document.getElementById('ccCopy');if(ccCopy)ccCopy.onclick=()=>{
+    const v=(document.getElementById('ccOut')||{}).value||'';if(!v)return;
+    if(navigator.clipboard)navigator.clipboard.writeText(v);
+    ccCopy.textContent='✓ Copied';setTimeout(()=>ccCopy.textContent='📋 Copy CC',1200);};
+  const ccClear=document.getElementById('ccClear');if(ccClear)ccClear.onclick=()=>{document.querySelectorAll('.ccbox').forEach(b=>b.checked=false);rebuildCC();};
+  document.querySelectorAll('[data-delp]').forEach(b=>b.onclick=()=>{S.people=(S.people||[]).filter(p=>p.id!==b.dataset.delp);save();render();});
+  const tpAdd=document.getElementById('tpAdd');if(tpAdd)tpAdd.onclick=()=>{const name=val('tpName');if(!name)return;(S.people=S.people||[]).push({id:'p'+Date.now(),name,group:val('tpGroup')||'Other',role:val('tpRole'),org:val('tpOrg'),email:val('tpEmail'),phone:val('tpPhone')});save();render();};
+
+  // profile fields
+  document.querySelectorAll('[data-p]').forEach(el=>el.oninput=()=>{S.profile[el.dataset.p]=el.value;save();});
+  document.querySelectorAll('[data-pri]').forEach(el=>el.oninput=()=>{S.priorities[+el.dataset.pri]=el.value;save();});
+  const addPri=document.getElementById('addPri');if(addPri)addPri.onclick=()=>{S.priorities.push('');save();render();};
+  const loadEx=document.getElementById('loadEx');if(loadEx)loadEx.onclick=()=>{if(confirm('Load the example? This replaces what\'s on screen.'))loadExample();};
+
+  // timeline
+  const tlAdd=document.getElementById('tlAdd');if(tlAdd)tlAdd.onclick=()=>{
+    const date=val('tlDate'),title=val('tlTitle');if(!title)return;
+    S.timeline.push({id:'t'+Date.now(),date,title,note:val('tlNote')});save();render();};
+  document.querySelectorAll('[data-deltl]').forEach(b=>b.onclick=()=>{S.timeline=S.timeline.filter(t=>t.id!==b.dataset.deltl);save();render();});
+
+  // docs
+  const pickDir=document.getElementById('pickDir');if(pickDir)pickDir.onclick=()=>document.getElementById('dirpick').click();
+  const pickFiles=document.getElementById('pickFiles');if(pickFiles)pickFiles.onclick=()=>document.getElementById('filepick').click();
+  const rescan=document.getElementById('rescan');if(rescan)rescan.onclick=()=>document.getElementById('dirpick').click();
+  const cg=document.getElementById('connectGoogle');if(cg)cg.onclick=connectDrive;
+  document.querySelectorAll('[data-filt]').forEach(b=>b.onclick=()=>{docFilter=b.dataset.filt;render();});
+  document.querySelectorAll('[data-doccat]').forEach(s=>s.onchange=()=>{const d=S.docs.find(x=>x.id===s.dataset.doccat);if(d){d.cat=s.value;save();}});
+  // docs preview (in-app)
+  document.querySelectorAll('[data-prev]').forEach(b=>b.onclick=()=>{const m=document.getElementById('docModal'),fr=document.getElementById('docFrame'),nm=document.getElementById('docModalName');if(fr)fr.src=b.dataset.prev;if(nm)nm.textContent=b.dataset.pname||'';if(m)m.style.display='block';});
+  const dmc=document.getElementById('docModalClose');if(dmc)dmc.onclick=()=>{const m=document.getElementById('docModal'),fr=document.getElementById('docFrame');if(fr)fr.src='about:blank';if(m)m.style.display='none';};
+  // trials
+  document.querySelectorAll('[data-tstatus]').forEach(s=>s.onchange=()=>{const t=(S.trials||[]).find(x=>x.id===s.dataset.tstatus);if(t){t.s=s.value;save();render();}});
+  document.querySelectorAll('[data-tprio]').forEach(s=>s.onchange=()=>{const t=(S.trials||[]).find(x=>x.id===s.dataset.tprio);if(t){t.pr=s.value;save();render();}});
+  document.querySelectorAll('[data-deltrial]').forEach(b=>b.onclick=()=>{S.trials=(S.trials||[]).filter(t=>t.id!==b.dataset.deltrial);save();render();});
+  const trAdd=document.getElementById('trAdd');if(trAdd)trAdd.onclick=()=>{const name=val('trName');if(!name)return;(S.trials=S.trials||[]).push({id:'tr'+Date.now(),name,nct:val('trNct'),mech:val('trMech'),site:val('trSite'),fit:val('trFit'),pr:'med',s:'notstarted'});save();render();};
+
+  // board (drag & drop)
+  let dragId=null;
+  document.querySelectorAll('[data-kcard]').forEach(card=>{
+    card.addEventListener('dragstart',e=>{dragId=card.dataset.kcard;card.style.opacity='.4';});
+    card.addEventListener('dragend',e=>{card.style.opacity='1';});
+  });
+  document.querySelectorAll('[data-kbody]').forEach(body=>{
+    body.addEventListener('dragover',e=>{e.preventDefault();body.style.background='#dbe7e0';});
+    body.addEventListener('dragleave',e=>{body.style.background='';});
+    body.addEventListener('drop',e=>{e.preventDefault();body.style.background='';
+      const o=S.outreach.find(x=>x.id===dragId);
+      if(o&&o.s!==body.dataset.kbody){
+        o.s=body.dataset.kbody;
+        (o.log=o.log||[]).push({date:today(),note:'Moved to "'+(STATUSES.find(s=>s[0]===o.s)||['',o.s])[1]+'"'});
+        save();render();
+      }
+    });
+  });
+  // board — click a card for full details
+  document.querySelectorAll('[data-kcard]').forEach(card=>{
+    card.style.cursor='pointer';
+    card.addEventListener('click',e=>{ if(e.target.closest('[data-emailo]'))return; showEmail(card.dataset.kcard); });
+  });
+
+  // companion chat
+  const cs=document.getElementById('chatSend');if(cs)cs.onclick=chatSend;
+  const ci=document.getElementById('chatIn');if(ci)ci.onkeydown=e=>{if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();chatSend();}};
+  const ast=document.getElementById('aiSetupToggle');if(ast)ast.onclick=e=>{e.preventDefault();const s=document.getElementById('aiSetup');if(s)s.style.display=(s.style.display==='none'?'block':'none');};
+  const cclr=document.getElementById('chatClear');if(cclr)cclr.onclick=e=>{e.preventDefault();if(confirm('Clear this conversation?')){S.chat=[];save();render();}};
+  const abk=document.getElementById('aiBackend');if(abk)abk.onchange=()=>{const v=abk.value,sh=(id,on)=>{const el=document.getElementById(id);if(el)el.style.display=on?'block':'none';};sh('setOllama',v==='ollama');sh('setClaude',v==='claude');sh('setOpenai',v==='openai');};
+  const asv=document.getElementById('aiSave');if(asv)asv.onclick=()=>{S.ai=S.ai||{};S.ai.backend=val('aiBackend')||'ollama';S.ai.ollamaModel=val('aiOllamaModel')||'llama3.2';S.ai.claudeKey=val('aiClaudeKey');S.ai.claudeModel=val('aiClaudeModel')||'claude-3-5-sonnet-latest';S.ai.openaiKey=val('aiOpenaiKey');S.ai.openaiModel=val('aiOpenaiModel')||'gpt-4o-mini';save();render();};
+  const catt=document.getElementById('chatAttach');if(catt)catt.onclick=()=>{const f=document.getElementById('chatFiles');if(f)f.click();};
+  const cfil=document.getElementById('chatFiles');if(cfil)cfil.onchange=e=>{if(e.target.files.length)addAttachments(e.target.files);e.target.value='';};
+  document.querySelectorAll('[data-rmatt]').forEach(a=>a.onclick=e=>{e.preventDefault();pendingAtt.splice(+a.dataset.rmatt,1);render();});
+  const clog=document.getElementById('chatLog');if(clog)clog.scrollTop=clog.scrollHeight;
+
+  // questions
+  document.querySelectorAll('[data-q]').forEach(c=>c.onchange=()=>{const q=S.questions.find(x=>x.id===c.dataset.q);if(q){q.done=c.checked;save();render();}});
+  const nqAdd=document.getElementById('nqAdd');if(nqAdd)nqAdd.onclick=()=>{
+    const t=val('nqT');if(!t)return;S.questions.push({id:'q'+Date.now(),c:val('nqCat')||'My questions',t,w:val('nqW'),done:false});save();render();};
+
+  // outreach
+  document.querySelectorAll('[data-o]').forEach(el=>el.oninput=()=>{const o=S.outreach.find(x=>x.id===el.dataset.o);if(o){o[el.dataset.of]=el.value;save();}});
+  document.querySelectorAll('[data-ostatus]').forEach(s=>s.onchange=()=>{const o=S.outreach.find(x=>x.id===s.dataset.ostatus);if(o){o.s=s.value;save();render();}});
+  document.querySelectorAll('[data-delo]').forEach(b=>b.onclick=()=>{if(confirm('Remove this contact?')){S.outreach=S.outreach.filter(o=>o.id!==b.dataset.delo);save();render();}});
+  document.querySelectorAll('[data-emailo]').forEach(b=>b.onclick=()=>showEmail(b.dataset.emailo));
+  const noAdd=document.getElementById('noAdd');if(noAdd)noAdd.onclick=()=>{
+    const who=val('noWho');if(!who)return;S.outreach.push({id:'o'+Date.now(),cat:val('noCat')||'Other',who,contact:val('noContact'),ask:val('noAsk'),s:'notstarted'});save();render();};
+
+  // assist
+  const gen=document.getElementById('genPrompt');if(gen)gen.onclick=()=>{document.getElementById('promptOut').textContent=buildPrompt();};
+  const cp=document.getElementById('copyPrompt');if(cp)cp.onclick=()=>{const t=document.getElementById('promptOut').textContent;navigator.clipboard&&navigator.clipboard.writeText(t);cp.textContent='✓ Copied';setTimeout(()=>cp.textContent='📋 Copy',1500);};
+
+  // about
+  const ex=document.getElementById('exportBtn');if(ex)ex.onclick=exportData;
+  const im=document.getElementById('importBtn');if(im)im.onclick=()=>document.getElementById('importpick').click();
+}
+function val(id){const e=document.getElementById(id);return e?e.value.trim():'';}
+
+function buildPrompt(){
+  const p=S.profile;
+  const tl=[...S.timeline].sort((a,b)=>(a.date||'').localeCompare(b.date||'')).map(t=>`- ${t.date}: ${t.title}${t.note?' ('+t.note+')':''}`).join('\n')||'- (none entered yet)';
+  const docs=S.docs.length?S.docs.map(d=>`- ${d.name} [${d.cat}]`).join('\n'):'- (no documents connected yet)';
+  const openQ=S.questions.filter(q=>!q.done).map(q=>`- ${q.t}`).join('\n')||'- (all checked)';
+  const out=S.outreach.map(o=>`- ${o.who} (${o.cat}) — ${STATUSES.find(s=>s[0]===o.s)[1]}`).join('\n');
+  return `You are my medical-advocacy research partner. I am a parent fighting for my child. Be honest, specific, and rigorous — I want truth over false comfort. Never state medical advice as fact; frame clinical points as things to verify with our doctors. Help me not miss any option.
+
+== MY CHILD ==
+Name: ${p.child||'[child]'}    DOB: ${p.dob||'[dob]'}
+Diagnosis: ${p.dx||'[diagnosis]'}    Markers: ${p.markers||'[markers]'}    Stage/extent: ${p.stage||'[stage]'}
+Current status: ${p.current||'[current]'}
+
+== TIMELINE ==
+${tl}
+
+== DOCUMENTS I CAN SHARE (ask me for any of these and I'll paste/upload them) ==
+${docs}
+
+== QUESTIONS I STILL NEED ANSWERED ==
+${openQ}
+
+== WHO I'VE CONTACTED ==
+${out||'- (none yet)'}
+
+== WHAT I NEED FROM YOU ==
+1. Read the documents I share and give me a clear, honest summary of where things stand.
+2. Tell me the single most important decision or question right now, and why.
+3. Identify any evidence-based option we may NOT be using, and any test/tissue/second opinion we're missing.
+4. List the specific expert centers, clinical trials, and foundations I should contact — and draft the outreach emails.
+5. Build me a prioritized "questions to ask" guide for my next appointment.
+Ask me for whatever you need. Let's go.`;
+}
+function exportData(){
+  const blob=new Blob([JSON.stringify(S,null,2)],{type:'application/json'});
+  const a=document.createElement('a');a.href=URL.createObjectURL(blob);
+  a.download='bloom-backup.json';a.click();
+}
+
+/* ===== Google Drive connect (client-side; data goes only between your browser and Google) ===== */
+let gdToken=null, gdTokenClient=null;
+function injectScript(src){return new Promise((res,rej)=>{if([...document.scripts].some(s=>s.src===src))return res();const s=document.createElement('script');s.src=src;s.onload=res;s.onerror=rej;document.head.appendChild(s);});}
+async function connectDrive(){
+  if(!GOOGLE_CLIENT_ID||!GOOGLE_API_KEY){showGoogleSetup();return;}
+  try{
+    if(!window.google||!window.google.accounts)await injectScript('https://accounts.google.com/gsi/client');
+    if(!window.gapi)await injectScript('https://apis.google.com/js/api.js');
+    await new Promise(r=>gapi.load('client:picker',r));
+    await gapi.client.init({apiKey:GOOGLE_API_KEY});
+    gdTokenClient=gdTokenClient||google.accounts.oauth2.initTokenClient({
+      client_id:GOOGLE_CLIENT_ID,
+      scope:'https://www.googleapis.com/auth/drive.readonly',
+      callback:(resp)=>{if(resp&&resp.access_token){gdToken=resp.access_token;openDrivePicker();}}
+    });
+    gdTokenClient.requestAccessToken({prompt:gdToken?'':'consent'});
+  }catch(e){alert('Could not start Google connect. See SETUP-GOOGLE.md.');}
+}
+function openDrivePicker(){
+  const view=new google.picker.DocsView(google.picker.ViewId.DOCS).setIncludeFolders(true).setSelectFolderEnabled(true);
+  new google.picker.PickerBuilder().setOAuthToken(gdToken).setDeveloperKey(GOOGLE_API_KEY)
+    .addView(view).enableFeature(google.picker.Feature.MULTISELECT_ENABLED)
+    .setCallback(async d=>{
+      if(d.action!==google.picker.Action.PICKED)return;
+      for(const doc of d.docs){if(doc.type==='folder')await ingestDriveFolder(doc.id);else await ingestDriveFile(doc);}
+      save();render();
+    }).build().setVisible(true);
+}
+async function ingestDriveFolder(id){
+  const q=encodeURIComponent(`'${id}' in parents and trashed=false`);
+  const r=await fetch(`https://www.googleapis.com/drive/v3/files?q=${q}&fields=files(id,name,mimeType,size)&pageSize=1000`,{headers:{Authorization:'Bearer '+gdToken}});
+  const j=await r.json();for(const f of (j.files||[]))await ingestDriveFile(f);
+}
+async function ingestDriveFile(f){
+  const ext=(f.name.split('.').pop()||'').toLowerCase();
+  if(S.docs.some(d=>d.path==='gdrive:'+f.id))return;
+  S.folderName=S.folderName&&S.folderName!=='My files'?S.folderName:'Google Drive';
+  let snippet='';const mt=f.mimeType||'';
+  try{
+    if(/google-apps\.document/.test(mt)){const r=await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}/export?mimeType=text/plain`,{headers:{Authorization:'Bearer '+gdToken}});snippet=(await r.text()).replace(/\s+/g,' ').trim().slice(0,600);}
+    else if(['txt','md','csv','json','rtf'].includes(ext)||/^text\//.test(mt)){const r=await fetch(`https://www.googleapis.com/drive/v3/files/${f.id}?alt=media`,{headers:{Authorization:'Bearer '+gdToken}});snippet=(await r.text()).replace(/\s+/g,' ').trim().slice(0,600);}
+  }catch(e){}
+  S.docs.push({id:'d'+Date.now()+Math.random().toString(36).slice(2,5),name:f.name,path:'gdrive:'+f.id,ext,size:f.size||0,cat:catGuess(f.name),snippet,source:'gdrive'});
+}
+function showGoogleSetup(){
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;inset:0;background:rgba(10,30,20,.55);display:grid;place-items:center;z-index:99;padding:20px';
+  d.innerHTML=`<div style="background:#fff;max-width:540px;border-radius:16px;padding:26px;font-size:14px;line-height:1.6;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <h3 style="margin:0 0 8px;color:#0a5137">Connect Google Drive — one-time setup</h3>
+    <p><b>Fastest way, no setup:</b> if you use <b>Google Drive for Desktop</b>, your Drive is already a folder on this computer — just click <b>“Connect a folder”</b> and pick your Google Drive folder. Done.</p>
+    <p style="margin-top:14px"><b>To sign in to Google directly</b> (needed for the public website), a one-time key is required (~5 min):</p>
+    <ol style="padding-left:18px;margin:6px 0">
+      <li>Host Bloom at a web address (GitHub Pages — free) or run it on localhost.</li>
+      <li>In <b>Google Cloud Console</b>: enable <b>Drive API</b> + <b>Picker API</b>; create an <b>OAuth Client ID (Web)</b> + an <b>API key</b>.</li>
+      <li>Add your Bloom address as an <b>Authorized JavaScript origin</b>.</li>
+      <li>Paste the two keys into the top of <code>app.html</code>.</li>
+    </ol>
+    <p style="font-size:12px;color:#5b6b63">Full guide: <b>SETUP-GOOGLE.md</b>. Bloom has no server — your files go only between your browser and Google.</p>
+    <div style="text-align:right"><button style="background:#0a8a5f;color:#fff;border:none;border-radius:8px;padding:8px 16px;font-weight:700;cursor:pointer" id="closeGS">Got it</button></div>
+  </div>`;
+  document.body.appendChild(d);
+  d.querySelector('#closeGS').onclick=()=>d.remove();d.onclick=e=>{if(e.target===d)d.remove();};
+}
+function showEmail(id){
+  const o=S.outreach.find(x=>x.id===id);if(!o)return;
+  const d=document.createElement('div');
+  d.style.cssText='position:fixed;inset:0;background:rgba(10,30,20,.55);display:grid;place-items:center;z-index:99;padding:20px';
+  d.innerHTML=`<div style="background:#fff;max-width:660px;width:100%;border-radius:16px;padding:22px;box-shadow:0 20px 60px rgba(0,0,0,.3)">
+    <h3 style="margin:0 0 2px;color:#0a5137">${esc(o.who)}</h3>
+    <div style="font-size:11.5px;color:#0a7a52;font-weight:600;margin-bottom:6px">${esc(o.cat||'')}${o.ask?' — '+esc(o.ask):''}</div>
+    <div style="font-size:11.5px;color:#567;margin-bottom:2px">To: ${esc(o.contact)||'—'}</div>
+    ${o.cc?`<div style="font-size:11.5px;color:#0a7a52;margin-bottom:8px;font-weight:600">CC: ${esc(o.cc)}</div>`:'<div style="margin-bottom:6px"></div>'}
+    <textarea id="emBody" placeholder="Write or paste this email here — it saves with the contact." style="width:100%;min-height:220px;border:1px solid #d6ded9;border-radius:8px;padding:11px;font-size:13px;font-family:inherit;line-height:1.55">${esc(o.email||'')}</textarea>
+    <div style="display:flex;gap:8px;align-items:center;margin-top:10px;flex-wrap:wrap">
+      <span style="font-size:12px;color:#567;font-weight:700">Status:</span>
+      <select id="emStatus" style="border:1px solid #d6ded9;border-radius:8px;padding:6px 9px;font-size:13px;font-family:inherit">${STATUSES.map(s=>`<option value="${s[0]}" ${o.s===s[0]?'selected':''}>${s[1]}</option>`).join('')}</select>
+    </div>
+    <div style="margin-top:14px;border-top:1px solid #eef1ef;padding-top:12px">
+      <div style="font-size:12px;font-weight:800;color:#0a5137;margin-bottom:6px">📇 Activity log — every back-and-forth</div>
+      <div id="emLog" style="max-height:150px;overflow-y:auto;margin-bottom:8px">${(o.log&&o.log.length)?o.log.slice().reverse().map(l=>`<div style="font-size:12.5px;padding:5px 0;border-bottom:1px dashed #eef1ef"><b style="color:#0a5137">${esc(l.date||'')}</b> — ${esc(l.note||'')}</div>`).join(''):'<div style="font-size:12px;color:#9aa">No activity logged yet. Add the first update below.</div>'}</div>
+      <div style="display:flex;gap:6px">
+        <input id="emLogNote" placeholder="What happened? e.g. 'Sent', 'She replied — wants scans', 'Call booked Tue'" style="flex:1;border:1px solid #d6ded9;border-radius:8px;padding:7px 10px;font-size:13px;font-family:inherit">
+        <button style="background:#0a8a5f;color:#fff;border:none;border-radius:8px;padding:7px 13px;font-weight:700;cursor:pointer" id="emLogAdd">+ Log</button>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;justify-content:flex-end;margin-top:14px">
+      <button style="background:#eef3f0;color:#0a5137;border:none;border-radius:8px;padding:7px 13px;font-weight:700;cursor:pointer" id="emCopy">📋 Copy</button>
+      <button style="background:#eef3f0;color:#0a5137;border:none;border-radius:8px;padding:7px 13px;font-weight:700;cursor:pointer" id="emSave">Save</button>
+      <button style="background:#0a8a5f;color:#fff;border:none;border-radius:8px;padding:7px 13px;font-weight:700;cursor:pointer" id="emClose">Close</button>
+    </div></div>`;
+  document.body.appendChild(d);
+  const ta=d.querySelector('#emBody');
+  d.querySelector('#emClose').onclick=()=>d.remove();
+  d.onclick=e=>{if(e.target===d)d.remove();};
+  d.querySelector('#emStatus').onchange=e=>{o.s=e.target.value;save();};
+  d.querySelector('#emLogAdd').onclick=()=>{
+    const note=d.querySelector('#emLogNote').value.trim();if(!note)return;
+    (o.log=o.log||[]).push({date:today(),note});o.email=ta.value;save();d.remove();showEmail(id);
+  };
+  d.querySelector('#emSave').onclick=()=>{o.email=ta.value;save();d.remove();render();};
+  d.querySelector('#emCopy').onclick=()=>{if(navigator.clipboard)navigator.clipboard.writeText(ta.value);const b=d.querySelector('#emCopy');b.textContent='✓ Copied';setTimeout(()=>b.textContent='📋 Copy',1400);};
+}
+
+// file inputs
+document.getElementById('dirpick').addEventListener('change',e=>{if(e.target.files.length){ingest(e.target.files);}e.target.value='';});
+document.getElementById('filepick').addEventListener('change',e=>{if(e.target.files.length){ingest(e.target.files);}e.target.value='';});
+document.getElementById('importpick').addEventListener('change',e=>{
+  const f=e.target.files[0];if(!f)return;const r=new FileReader();
+  r.onload=()=>{try{const v=JSON.parse(r.result);if(v.profile){S=v;save();render();alert('Data imported.');}}catch(err){alert('Could not read that file.');}};
+  r.readAsText(f);e.target.value='';});
+
+render();
+</script>
+</body>
+</html>

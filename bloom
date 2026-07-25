@@ -1,0 +1,100 @@
+#!/usr/bin/env python3
+"""bloom - a tiny command-line companion for the Bloom toolkit.
+
+No dependencies (Python 3 standard library only). Works on macOS, Linux, Windows.
+
+Commands:
+  bloom trials "<condition>"    Search ClinicalTrials.gov for RECRUITING trials
+  bloom trials "<cond>" --all   Include non-recruiting statuses too
+  bloom open                    Open the Bloom app (app.html) in your browser
+  bloom copilot                 Print the AI Copilot prompt (paste into Claude/ChatGPT)
+  bloom help                    Show this help
+
+Examples:
+  ./bloom trials "Ewing sarcoma"
+  ./bloom trials "neuroblastoma"
+  ./bloom copilot | pbcopy        # copy the AI prompt to your clipboard (macOS)
+"""
+import sys, os, json, webbrowser, urllib.parse, urllib.request
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+API = "https://clinicaltrials.gov/api/v2/studies"
+
+
+def trials(cond, status="RECRUITING", limit=50):
+    fields = ",".join([
+        "protocolSection.identificationModule.nctId",
+        "protocolSection.identificationModule.briefTitle",
+        "protocolSection.statusModule.overallStatus",
+        "protocolSection.contactsLocationsModule.locations",
+    ])
+    q = {"query.cond": cond, "pageSize": str(limit), "fields": fields, "format": "json"}
+    if status:
+        q["filter.overallStatus"] = status
+    url = API + "?" + urllib.parse.urlencode(q)
+    try:
+        with urllib.request.urlopen(url, timeout=30) as r:
+            data = json.load(r)
+    except Exception as e:
+        print("Could not reach ClinicalTrials.gov:", e)
+        return
+    studies = data.get("studies", [])
+    label = (status.lower() + " ") if status else ""
+    print('\n%d %strial(s) for "%s":\n' % (len(studies), label, cond))
+    for s in studies:
+        p = s.get("protocolSection", {})
+        nct = p.get("identificationModule", {}).get("nctId", "?")
+        ttl = p.get("identificationModule", {}).get("briefTitle", "")
+        st = p.get("statusModule", {}).get("overallStatus", "")
+        locs = p.get("contactsLocationsModule", {}).get("locations", []) or []
+        countries = sorted({l.get("country") for l in locs if l.get("country")})
+        cc = ", ".join(countries[:6]) + (" ..." if len(countries) > 6 else "")
+        st_tag = "" if status else "[%s] " % st
+        print("  %s  %s%s" % (nct, st_tag, ttl[:86]))
+        print("      https://clinicaltrials.gov/study/%s" % nct)
+        if cc:
+            print("      sites: %s" % cc)
+        print("")
+    print("Trial status and eligibility change often - always confirm directly with the study team.")
+
+
+def open_app():
+    app = os.path.join(HERE, "app.html")
+    if not os.path.exists(app):
+        print("app.html not found next to this script.")
+        return
+    webbrowser.open("file://" + app)
+    print("Opened app.html in your browser.")
+
+
+def copilot():
+    f = os.path.join(HERE, "AI-COPILOT-PROMPT.md")
+    if os.path.exists(f):
+        print(open(f, encoding="utf-8").read())
+    else:
+        print("AI-COPILOT-PROMPT.md not found next to this script.")
+
+
+def main():
+    a = sys.argv[1:]
+    if not a or a[0] in ("help", "-h", "--help"):
+        print(__doc__)
+        return
+    cmd = a[0]
+    if cmd == "trials":
+        if len(a) < 2:
+            print('Usage: bloom trials "<condition>"')
+            return
+        status = "" if "--all" in a else "RECRUITING"
+        trials(a[1], status=status)
+    elif cmd == "open":
+        open_app()
+    elif cmd == "copilot":
+        copilot()
+    else:
+        print("Unknown command: %s\n" % cmd)
+        print(__doc__)
+
+
+if __name__ == "__main__":
+    main()

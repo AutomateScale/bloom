@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Bloom — a calm home for the hardest fight</title>
+<meta name="description" content="Bloom is a free, open-source, private dashboard for families managing a serious illness. Care team, clinical trials, scans, documents and questions — in one clear place. Built for the Ewing sarcoma community.">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ctext y='.9em' font-size='90'%3E%F0%9F%8C%BB%3C/text%3E%3C/svg%3E">
+<style>
+  :root{
+    --g1:#2b6f52; --g2:#4f9e77; --g3:#8ec48c; --gold:#f2c14e; --ink:#20302a;
+    --soft:#5b6b63; --bg:#f7faf6; --card:#ffffff; --line:#e4ede6;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{margin:0;font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Helvetica,Arial,sans-serif;
+       color:var(--ink);background:var(--bg);line-height:1.6;-webkit-font-smoothing:antialiased}
+  .wrap{max-width:1060px;margin:0 auto;padding:0 22px}
+  a{color:var(--g1)}
+  .btn{display:inline-block;text-decoration:none;font-weight:800;border-radius:14px;padding:14px 26px;font-size:16px;
+       transition:transform .12s ease, box-shadow .12s ease}
+  .btn:hover{transform:translateY(-2px)}
+  .btn-gold{background:var(--gold);color:#3a2e12;box-shadow:0 8px 22px rgba(242,193,78,.35)}
+  .btn-ghost{background:rgba(255,255,255,.14);color:#fff;border:1px solid rgba(255,255,255,.4)}
+  .btn-dark{background:var(--g1);color:#fff;box-shadow:0 8px 22px rgba(43,111,82,.28)}
+
+  /* hero */
+  header.hero{background:linear-gradient(165deg,#245f47 0%,#3f8f6b 55%,#67b183 100%);color:#fff;
+              padding:70px 0 88px;position:relative;overflow:hidden}
+  header.hero::after{content:"🌻";position:absolute;right:-20px;bottom:-30px;font-size:220px;opacity:.10;transform:rotate(-12deg)}
+  .brand{display:flex;align-items:center;gap:10px;font-weight:800;font-size:20px;letter-spacing:.2px}
+  .brand .dot{font-size:24px}
+  .hero h1{font-size:clamp(34px,6vw,58px);line-height:1.05;margin:26px 0 14px;font-weight:850;max-width:15ch}
+  .hero p.lead{font-size:clamp(17px,2.4vw,21px);max-width:56ch;opacity:.96;margin:0 0 30px}
+  .hero .cta{display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  .hero .micro{opacity:.85;font-size:13.5px;margin-top:18px}
+
+  /* sections */
+  section{padding:66px 0}
+  .eyebrow{text-transform:uppercase;letter-spacing:.14em;font-size:12.5px;font-weight:800;color:var(--g2)}
+  h2{font-size:clamp(26px,4vw,38px);line-height:1.12;margin:8px 0 14px;font-weight:840}
+  .sub{font-size:18px;color:var(--soft);max-width:60ch}
+
+  .story{background:var(--card);border-top:1px solid var(--line);border-bottom:1px solid var(--line)}
+  .story .quote{font-size:clamp(20px,3vw,27px);line-height:1.4;font-weight:600;max-width:40ch;color:var(--ink)}
+  .story .by{margin-top:16px;color:var(--soft);font-size:15px}
+
+  .grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:18px;margin-top:34px}
+  .feat{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px 22px 20px;
+        box-shadow:0 2px 10px rgba(30,60,45,.04)}
+  .feat .ic{font-size:26px}
+  .feat h3{margin:12px 0 6px;font-size:18.5px}
+  .feat p{margin:0;color:var(--soft);font-size:15px}
+
+  .split{display:grid;grid-template-columns:1.1fr 1fr;gap:44px;align-items:center}
+  @media(max-width:760px){.split{grid-template-columns:1fr}}
+  .panel{background:linear-gradient(160deg,#eef7f0,#dcefe1);border:1px solid var(--line);border-radius:20px;padding:28px}
+  .panel ul{margin:10px 0 0;padding-left:0;list-style:none}
+  .panel li{padding:8px 0;border-bottom:1px dashed #cfe3d5;font-weight:600}
+  .panel li:last-child{border:none}
+  .panel li b{color:var(--g1)}
+
+  .band{background:linear-gradient(165deg,#245f47,#3f8f6b);color:#fff;border-radius:24px;padding:48px 34px;text-align:center;margin:0 auto}
+  .band h2{color:#fff}
+  .band p{max-width:52ch;margin:10px auto 24px;opacity:.95;font-size:18px}
+
+  footer{padding:44px 0 60px;color:var(--soft);font-size:14px}
+  .disc{background:#fff;border:1px solid var(--line);border-left:4px solid var(--gold);border-radius:12px;
+        padding:16px 18px;margin:0 0 26px;font-size:13.5px;color:#4a5a52}
+  .foot-row{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;align-items:center}
+</style>
+</head>
+<body>
+
+<header class="hero">
+  <div class="wrap">
+    <div class="brand"><span class="dot">🌻</span> Bloom</div>
+    <h1>A calm home for the hardest fight.</h1>
+    <p class="lead">When your child is seriously ill, the information becomes its own crisis — scattered across inboxes, patient portals, and notebooks at 3&nbsp;a.m. Bloom pulls it all into one clear, private place, so you can spend your energy on your child instead of the chaos.</p>
+    <div class="cta">
+      <a class="btn btn-gold" href="#get">Get Bloom — free →</a>
+      <a class="btn btn-ghost" href="#features">See how it works</a>
+    </div>
+    <div class="micro">Free · open source · private by design · nothing to sign up for</div>
+  </div>
+</header>
+
+<section class="story">
+  <div class="wrap">
+    <div class="eyebrow">Why it exists</div>
+    <p class="quote">Bloom was built by a father, in the middle of the fight — coordinating his young son's relapsed Ewing sarcoma care across three continents, dozens of clinical trials, and a mountain of scans and reports.</p>
+    <p class="by">No tool existed for that. So he built one — and he's giving it to every family who comes next, for free.</p>
+  </div>
+</section>
+
+<section id="features">
+  <div class="wrap">
+    <div class="eyebrow">What Bloom holds</div>
+    <h2>Everything, in one place — finally.</h2>
+    <p class="sub">The pieces you're juggling by hand, organized the way a caregiver actually thinks.</p>
+    <div class="grid">
+      <div class="feat"><div class="ic">🩺</div><h3>Care Team</h3><p>Every doctor, center, and contact — with who said what, and what's next.</p></div>
+      <div class="feat"><div class="ic">🔬</div><h3>Clinical Trials</h3><p>Track options, eligibility, sites and status. Print a clean, current list for your oncologist in one tap.</p></div>
+      <div class="feat"><div class="ic">🗓️</div><h3>Timeline &amp; Scans</h3><p>The whole treatment history — chemo, surgery, radiation, imaging — in order, at a glance.</p></div>
+      <div class="feat"><div class="ic">📄</div><h3>Documents</h3><p>Pathology, reports, and imaging, all linked and findable when a new center asks.</p></div>
+      <div class="feat"><div class="ic">❓</div><h3>Questions</h3><p>Capture every question the moment it hits you, so nothing is forgotten at the next appointment.</p></div>
+      <div class="feat"><div class="ic">✉️</div><h3>Outreach</h3><p>Who you've contacted, what they replied, and what still needs a follow-up.</p></div>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap split">
+    <div>
+      <div class="eyebrow">Private by design</div>
+      <h2>Your family's data stays yours.</h2>
+      <p class="sub">Bloom runs in your browser and keeps your information on your own device. No accounts. No servers collecting your child's diagnosis. No tracking. Because it's open source under the MIT license, anyone can inspect exactly what it does — and adapt it.</p>
+    </div>
+    <div class="panel">
+      <ul>
+        <li><b>Local-first</b> — data lives on your device</li>
+        <li><b>No sign-up</b> — open it and start</li>
+        <li><b>No tracking</b> — no analytics, no ads</li>
+        <li><b>Open source (MIT)</b> — free to copy, adapt, share</li>
+        <li><b>Works offline</b> — a single file that just works</li>
+      </ul>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap split">
+    <div class="panel" style="background:linear-gradient(160deg,#fff6df,#fdeec2);border-color:#f3e2b0">
+      <div style="font-size:44px;line-height:1">🌱</div>
+      <h3 style="margin:10px 0 6px;font-size:20px">Ewing first. Any disease next.</h3>
+      <p style="margin:0;color:#7a6a3a;font-weight:600">Bloom is really just a structure for the fight. Swap in any diagnosis and it adapts.</p>
+    </div>
+    <div>
+      <div class="eyebrow">For every family</div>
+      <h2>Built for Ewing sarcoma — made to help anyone.</h2>
+      <p class="sub">It started with one rare pediatric cancer, but the chaos is the same for every serious diagnosis. Bloom is designed so any family — any disease — can pick it up and make it their own.</p>
+    </div>
+  </div>
+</section>
+
+<section>
+  <div class="wrap split">
+    <div>
+      <div class="eyebrow">Bring your own AI</div>
+      <h2>Turn any AI into your family's war&#8209;room.</h2>
+      <p class="sub">Bloom ships with a ready-made <b>Copilot prompt</b> — paste it into Claude or ChatGPT together with your Bloom data, and the AI becomes a rigorous research-and-coordination partner: finding and vetting clinical trials, summarizing doctor replies, and prepping your questions for the next visit. The same "war room" a parent built during his own child's fight — packaged for you.</p>
+    </div>
+    <div class="panel" style="background:linear-gradient(160deg,#eef3ff,#e2e9fb);border-color:#d6def5">
+      <div style="font-size:13px;color:#3a4a7a;font-weight:800;margin-bottom:8px">Also: a tiny command-line tool</div>
+      <div style="background:#0e1830;color:#d7e3ff;border-radius:10px;padding:13px 15px;font-size:13px;line-height:1.8;white-space:pre;overflow-x:auto;font-family:ui-monospace,Menlo,monospace">$ bloom trials "Ewing sarcoma"
+$ bloom copilot     <span style="color:#7f93c4"># print the AI prompt</span>
+$ bloom open        <span style="color:#7f93c4"># launch the app</span></div>
+      <p style="margin:12px 0 0;color:#4a5a7a;font-size:13.5px">Pure Python 3 — no install, no dependencies. Searches ClinicalTrials.gov right from your terminal.</p>
+    </div>
+  </div>
+</section>
+
+<section id="get">
+  <div class="wrap">
+    <div class="eyebrow" style="text-align:center">Get Bloom</div>
+    <h2 style="text-align:center">Free. Take all of it.</h2>
+    <div class="grid" style="margin-top:30px">
+      <div class="feat"><div class="ic">🌻</div><h3>The App</h3><p>A single file — open <code>app.html</code> in any browser. Private, offline, nothing to install.</p><p style="margin-top:14px"><a class="btn btn-dark" style="padding:11px 20px;font-size:14px" href="app" download="bloom.html">Download</a></p></div>
+      <div class="feat"><div class="ic">⌨️</div><h3>The CLI</h3><p>The <code>bloom</code> command — search trials, launch the app, print the AI prompt. Python&nbsp;3, zero dependencies.</p><p style="margin-top:14px"><a class="btn btn-dark" style="padding:11px 20px;font-size:14px" href="bloom" download>Get the CLI</a></p></div>
+      <div class="feat"><div class="ic">🤖</div><h3>The AI Copilot</h3><p>A ready-made prompt that turns Claude or ChatGPT into your research &amp; coordination partner.</p><p style="margin-top:14px"><a class="btn btn-dark" style="padding:11px 20px;font-size:14px" href="AI-COPILOT-PROMPT.md" download>Get the prompt</a></p></div>
+    </div>
+    <div class="band" style="margin-top:36px">
+      <div style="font-size:44px">🌻</div>
+      <h2>Take it. It's yours.</h2>
+      <p>Free, open source, and made for the people walking the hardest road. If it helps your family the way it helped ours, that's the whole point.</p>
+      <div style="display:flex;gap:14px;justify-content:center;flex-wrap:wrap">
+        <a class="btn btn-gold" href="https://github.com/AutomateScale/bloom" target="_blank" rel="noopener">View on GitHub</a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div class="disc">
+      <b>Please note:</b> Bloom is an organizational tool, not medical advice. It does not diagnose, treat, or recommend care, and it is not affiliated with any hospital, clinical trial, or foundation. Always rely on your child's medical team for medical decisions.
+    </div>
+    <div class="foot-row">
+      <div>🌻 <b>Bloom</b> — open source (MIT). Made with love for the Ewing sarcoma community.</div>
+      <div><a href="https://github.com/AutomateScale/bloom" target="_blank" rel="noopener">GitHub</a> · <a href="#features">Features</a> · <a href="#get">Get it</a></div>
+    </div>
+  </div>
+</footer>
+
+</body>
+</html>

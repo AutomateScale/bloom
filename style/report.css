@@ -1,0 +1,18 @@
+body{font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:900px;margin:36px auto;padding:0 32px;color:#1a1a1a;line-height:1.5}
+h1{font-size:24px;color:#8a0018;border-bottom:3px solid #b00020;padding-bottom:8px}
+h2{font-size:18px;color:#b00020;margin-top:0;border-bottom:1px solid #e6dcdc;padding-bottom:4px;page-break-before:always;break-before:page}
+h2:first-of-type{page-break-before:avoid;break-before:avoid}
+h2,h3{page-break-after:avoid;break-after:avoid}
+h3{font-size:15px;color:#0a3d62;margin-top:18px}
+blockquote{background:#fff4f4;border-left:4px solid #b00020;padding:11px 15px;border-radius:4px;margin:12px 0;color:#2a1416}
+blockquote strong{color:#8a0018}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13px;page-break-inside:avoid}
+th{background:#b00020;color:#fff;text-align:left;padding:7px 9px}
+td{border:1px solid #dcccce;padding:6px 9px;vertical-align:top}
+tr:nth-child(even){background:#fbf6f6}
+strong{color:#000}
+em{color:#555}
+hr{display:none}
+ul{margin:8px 0}
+li{margin:3px 0}
+code{background:#f0eaea;padding:1px 4px;border-radius:3px;font-size:12px}

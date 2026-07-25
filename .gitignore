@@ -1,0 +1,4 @@
+# never commit a family's private data
+board/status.json
+*.private.*
+/private/

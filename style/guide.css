@@ -1,0 +1,19 @@
+body{font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:860px;margin:36px auto;padding:0 32px;color:#1a1a1a;line-height:1.55}
+h1{font-size:23px;color:#0a5137;border-bottom:3px solid #0a8a5f;padding-bottom:8px}
+h2{font-size:17px;color:#0a8a5f;margin-top:0;border-bottom:1px solid #dfe7e3;padding-bottom:4px;page-break-before:always;break-before:page}
+h2:first-of-type{page-break-before:avoid;break-before:avoid}
+h1+*,h2,h3{page-break-after:avoid;break-after:avoid}
+h3{font-size:14px;color:#0a5137;margin-top:16px}
+/* "Say this" scripts — the most actionable lines — get a soft green callout */
+blockquote{background:#eef7f2;border-left:4px solid #0a8a5f;padding:11px 15px;border-radius:4px;margin:12px 0;color:#12261e;font-size:14.5px}
+blockquote strong{color:#08492f}
+strong{color:#000}
+em{color:#5a6a63}
+hr{display:none}
+ul,ol{margin:8px 0}
+li{margin:4px 0}
+code{background:#eef2f0;padding:1px 4px;border-radius:3px;font-size:12px}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:13px;page-break-inside:avoid}
+th{background:#0a8a5f;color:#fff;text-align:left;padding:7px 9px}
+td{border:1px solid #cfe0d8;padding:6px 9px;vertical-align:top}
+tr:nth-child(even){background:#f5faf7}

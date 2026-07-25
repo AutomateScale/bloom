@@ -1,0 +1,12 @@
+{
+  "updated": "YYYY-MM-DD — short note",
+  "fronts": {
+    "medical": {"name": "MEDICAL", "level": "amber", "status": "one-line current state",
+      "items": ["key fact", "key fact"],
+      "deadlines": [{"date": "2026-01-15", "label": "next scan / appointment"}],
+      "actions": ["next best move"]},
+    "logistics": {"name": "LOGISTICS", "level": "green", "status": "travel / insurance / home",
+      "items": ["key fact"], "deadlines": [], "actions": ["next step"]}
+  },
+  "priorities": ["The single most important thing to do right now", "Second priority"]
+}

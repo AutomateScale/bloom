@@ -1,0 +1,19 @@
+body{font-family:-apple-system,Helvetica,Arial,sans-serif;max-width:900px;margin:34px auto;padding:0 32px;color:#1a1a1a;line-height:1.5}
+h1{font-size:25px;color:#1a1a2e;border-bottom:3px solid #1a1a2e;padding-bottom:8px}
+h2{font-size:19px;color:#b00020;margin-top:0;border-bottom:2px solid #e6dcdc;padding-bottom:5px;page-break-before:always;break-before:page}
+h2:first-of-type{page-break-before:avoid;break-before:avoid}
+h2,h3{page-break-after:avoid;break-after:avoid}
+h3{font-size:15px;color:#0a3d62;margin-top:16px}
+/* Critical callouts (central issue, key quotes) — soft red flag */
+blockquote{background:#fff4f4;border-left:4px solid #b00020;padding:11px 15px;border-radius:4px;margin:12px 0;color:#2a1416;font-size:14px}
+blockquote strong{color:#8a0018}
+table{border-collapse:collapse;width:100%;margin:12px 0;font-size:12.5px;page-break-inside:avoid}
+th{background:#1a1a2e;color:#fff;text-align:left;padding:7px 9px}
+td{border:1px solid #d3d3dd;padding:6px 9px;vertical-align:top}
+tr:nth-child(even){background:#f6f6f9}
+strong{color:#000}
+em{color:#555}
+hr{display:none}
+ul,ol{margin:8px 0}
+li{margin:3px 0}
+code{background:#f0f0f2;padding:1px 4px;border-radius:3px;font-size:12px}
