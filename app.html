@@ -323,7 +323,7 @@ function vOverview(){
   <div class="card"><h3>Child</h3>
     <div class="row">
       <div style="flex:1;min-width:200px"><label class="lab">Name</label><input class="f" data-p="child" value="${esc(p.child)}" placeholder="Child's name"></div>
-      <div style="flex:1;min-width:140px"><label class="lab">Date of birth</label><input class="f" data-p="dob" value="${esc(p.dob)}" placeholder="e.g. 22 Jan 2018"></div>
+      <div style="flex:1;min-width:140px"><label class="lab">Date of birth</label><input class="f" data-p="dob" value="${esc(p.dob)}" placeholder="e.g. 14 Mar 2016"></div>
     </div>
     <label class="lab">Diagnosis</label><input class="f" data-p="dx" value="${esc(p.dx)}" placeholder="e.g. Ewing sarcoma">
     <div class="row">
@@ -637,7 +637,7 @@ Be part gentle listener, part practical help:
 - It is okay to just sit with them in something hard.
 - When they ask you to help think something through (medical, logistical, legal, emotional), help clearly using the context below — but never make definitive medical or legal decisions for them; gently point those back to their care team or lawyer.
 - Never minimise what they are going through.
-- If they express thoughts of self-harm, hopelessness, or not being able to go on: gently and directly encourage them to reach a real person right now (in Belgium: 107 Télé-Accueil, free and 24/7; or 112 for emergencies), and stay present with them.
+- If they express thoughts of self-harm, hopelessness, or not being able to go on: gently and directly encourage them to reach a real person right now — in the US call or text 988 (Suicide & Crisis Lifeline); in the UK call 116 123 (Samaritans); in Belgium call 107 (Télé-Accueil); anywhere else, findahelpline.com lists local services, or call your local emergency number (112 in Europe, 911 in the US) — and stay present with them.
 - You are an AI companion, not a therapist or doctor — be honest about that if it matters.
 
 What you know (may be incomplete):
@@ -711,7 +711,7 @@ function vAssist(){
   return `
   <h2 class="title">Talk it through</h2>
   <p class="sub">A private place to talk when it's heavy — or to help you think something through. It knows your notes, and it runs on <b>your</b> machine or <b>your</b> AI key, so nothing here leaves your control.</p>
-  <div class="banner">💚 A caring AI companion — <b>not</b> a therapist or doctor. If things feel unbearable or you have thoughts of harming yourself, please reach a real person now: in Belgium, <b>107</b> (Télé-Accueil, free, 24/7) or <b>112</b> for emergencies. You should not be alone with this.</div>
+  <div class="banner">💚 A caring AI companion — <b>not</b> a therapist or doctor. If things feel unbearable or you have thoughts of harming yourself, please reach a real person now — US: call or text <b>988</b> · UK: <b>116 123</b> · Belgium: <b>107</b> · elsewhere: <a href="https://findahelpline.com" target="_blank" rel="noopener">findahelpline.com</a>, or your emergency number (<b>112</b> Europe / <b>911</b> US). You should not be alone with this.</div>
   <div class="card">
     <div id="chatLog" style="max-height:50vh;overflow-y:auto;display:flex;flex-direction:column;gap:10px;padding:4px 2px">
       ${chat.length? chat.map(m=>chatBubble(m)).join('') : `<div class="mini" style="text-align:center;padding:26px 10px;line-height:1.6">However you're feeling right now, you can just start typing.<br>I'm here — no rush, no judgment. 🌱</div>`}
@@ -880,7 +880,7 @@ function catGuess(name){const n=name.toLowerCase();
   if(/path|biops|histo|anatomo/.test(n))return 'Diagnosis & pathology';
   if(/genet|molecul|ngs|fusion|fish|\bdna\b|\brna\b|inform|ghent|gand|ewsr|etv1|fli1/.test(n))return 'Genetics & molecular';
   if(/lab|blood|cbc|bloods|\bnfs\b|prise de sang/.test(n))return 'Labs';
-  if(/opinion|mora|meyers|dubois|janeway|dirksen|second|avis/.test(n))return 'Second opinions';
+  if(/opinion|second|avis|consult|review|referral/.test(n))return 'Second opinions';
   if(/\bmri\b|\birm\b|\bct\b|\bpet\b|\btep\b|scan|scanner|thorax|radiolog|report|rapport/.test(n))return 'Imaging — reports';
   if(/protocol|treatment|traitement|chemo|regimen|radio|vinorelb|regorafenib|cyclophosph|maintenance|\brt\b/.test(n))return 'Treatment & radiotherapy';
   if(/consult|letter|courrier|attest|\bnote\b/.test(n))return 'Doctor letters & consultations';
